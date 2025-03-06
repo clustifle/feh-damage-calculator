@@ -216,35 +216,47 @@
                     <summary>Unit Stats</summary>
                     <div class="section">
                         <label>Attacker's Atk</label>
-                        <input type="number" id="atk" min="0" max="99" value="50">
+                        <input type="number" id="atk" min="0" max="99" placeholder="....">
                     </div>
                     <div class="section">
                         <label>Atk Buff/Debuff (±)</label>
-                        <input type="number" id="atkBuff" min="-99" max="99" value="0">
+                        <input type="number" id="atkBuff" min="-99" max="99" placeholder="0">
                     </div>
                     <div class="section">
                         <label>Attacker's Spd</label>
-                        <input type="number" id="atkSpd" min="0" max="99" value="30">
+                        <input type="number" id="atkSpd" min="0" max="99" placeholder="....">
                     </div>
                     <div class="section">
                         <label>Attacker's HP</label>
-                        <input type="number" id="atkHP" min="0" max="99" value="40">
+                        <input type="number" id="atkHP" min="0" max="99" placeholder="....">
                     </div>
                     <div class="section">
-                        <label>Defender's Def/Res</label>
-                        <input type="number" id="def" min="0" max="99" value="30">
+                        <label>Attacker's Max HP</label>
+                        <input type="number" id="atkMaxHP" min="0" max="99" placeholder="....">
+                    </div>
+                    <div class="section">
+                        <label>Defender's Def</label>
+                        <input type="number" id="def" min="0" max="99" placeholder="....">
+                    </div>
+                    <div class="section">
+                        <label>Defender's Res</label>
+                        <input type="number" id="res" min="0" max="99" placeholder="....">
                     </div>
                     <div class="section">
                         <label>Def/Res Buff/Debuff (±)</label>
-                        <input type="number" id="defBuff" min="-99" max="99" value="0">
+                        <input type="number" id="defBuff" min="-99" max="99" placeholder="0">
                     </div>
                     <div class="section">
                         <label>Defender's Spd</label>
-                        <input type="number" id="defSpd" min="0" max="99" value="25">
+                        <input type="number" id="defSpd" min="0" max="99" placeholder="....">
                     </div>
                     <div class="section">
                         <label>Defender's HP</label>
-                        <input type="number" id="defHP" min="0" max="99" value="40">
+                        <input type="number" id="defHP" min="0" max="99" placeholder="....">
+                    </div>
+                    <div class="section">
+                        <label>Defender's Max HP</label>
+                        <input type="number" id="defMaxHP" min="0" max="99" placeholder="....">
                     </div>
                 </details>
                 <details open>
@@ -290,7 +302,29 @@
                     </div>
                     <div class="section">
                         <label>True Damage</label>
-                        <input type="number" id="trueDamage" min="0" max="99" value="0">
+                        <input type="number" id="trueDamage" min="0" max="99" placeholder="0">
+                    </div>
+                    <div class="section">
+                        <label>Pre-Combat Damage</label>
+                        <input type="number" id="preCombatDamage" min="0" max="99" placeholder="0">
+                        <label><input type="checkbox" id="unmitigated"> Unmitigated</label>
+                    </div>
+                    <div class="section">
+                        <label>Emblem Effect</label>
+                        <select id="emblemEffect">
+                            <option value="none">None</option>
+                            <option value="ike">Emblem Ike (Null C-Disrupt, 40% DR)</option>
+                            <option value="lyn">Emblem Lyn (+7 True Damage)</option>
+                        </select>
+                    </div>
+                    <div class="section">
+                        <label>Canto Distance</label>
+                        <input type="number" id="cantoDistance" min="0" max="4" placeholder="0">
+                        <label><input type="checkbox" id="cantoActive"> Canto Active</label>
+                    </div>
+                    <div class="section">
+                        <label>Pierces Damage Reduction (%)</label>
+                        <input type="number" id="pierceDR" min="0" max="100" placeholder="0">
                     </div>
                     <div class="section">
                         <label>Critical Multiplier</label>
@@ -309,11 +343,43 @@
                     </div>
                     <div class="section">
                         <label>Percent Reduction (%)</label>
-                        <input type="number" id="percentReduction" min="0" max="100" value="0">
+                        <input type="number" id="percentReduction" min="0" max="100" placeholder="0">
                     </div>
                     <div class="section">
                         <label>Fixed Reduction</label>
-                        <input type="number" id="fixedReduction" min="0" max="99" value="0">
+                        <input type="number" id="fixedReduction" min="0" max="99" placeholder="0">
+                    </div>
+                </details>
+                <details>
+                    <summary>Advanced Stats</summary>
+                    <div class="section">
+                        <label>Stat Comparison Boost (Damage per 5 excess)</label>
+                        <select id="statCompare">
+                            <option value="none">None</option>
+                            <option value="atkVsDef">Atk vs Def/Res</option>
+                            <option value="spdVsSpd">Spd vs Spd</option>
+                        </select>
+                    </div>
+                    <div class="section">
+                        <label>HP Threshold Modifier</label>
+                        <select id="hpThreshold">
+                            <option value="none">None</option>
+                            <option value="high">High HP (+5 Damage if ≥80%)</option>
+                            <option value="low">Low HP (+20% DR if <50%)</option>
+                        </select>
+                    </div>
+                    <div class="section">
+                        <label>Stat-to-Damage Conversion (%)</label>
+                        <input type="number" id="statConvertPercent" min="0" max="100" placeholder="0">
+                        <select id="statConvert">
+                            <option value="none">None</option>
+                            <option value="spd">Spd</option>
+                            <option value="def">Def/Res</option>
+                        </select>
+                    </div>
+                    <div class="section">
+                        <label>Dynamic Stat Scaling (Damage per 10 total stats)</label>
+                        <input type="number" id="statScale" min="0" max="10" placeholder="0">
                     </div>
                 </details>
                 <details>
@@ -324,9 +390,34 @@
                     <div class="section">
                         <label><input type="checkbox" id="deflectMagic"> Deflect Magic (50% Reduction vs Magic)</label>
                     </div>
+                    <div class="section">
+                        <label><input type="checkbox" id="savior"> Savior Active</label>
+                    </div>
+                    <div class="section">
+                        <label><input type="checkbox" id="warpBubble"> Warp Bubble</label>
+                    </div>
+                    <div class="section">
+                        <label><input type="checkbox" id="nullFollowUp"> Null Follow-Up</label>
+                    </div>
+                    <div class="section">
+                        <label><input type="checkbox" id="guaranteeFollowUp"> Guarantee Follow-Up</label>
+                    </div>
                 </details>
                 <details>
                     <summary>Options</summary>
+                    <div class="section">
+                        <label>Extra Actions (Galeforce)</label>
+                        <input type="number" id="extraActions" min="0" max="3" placeholder="0">
+                        <label><input type="checkbox" id="galeforce"> Galeforce Trigger</label>
+                    </div>
+                    <div class="section">
+                        <label>Divine Vein</label>
+                        <select id="divineVein">
+                            <option value="none">None</option>
+                            <option value="stone">Stone (+20% DR)</option>
+                            <option value="flame">Flame (+10 True Damage)</option>
+                        </select>
+                    </div>
                     <div class="section">
                         <label><input type="checkbox" id="counter"> Defender Can Counter</label>
                     </div>
@@ -406,92 +497,201 @@
         // Main Calculation
         function calculateDamage() {
             const log = [];
-            const atk = getInput('atk', 0, 99, 50) + getInput('atkBuff', -99, 99, 0);
-            const atkSpd = getInput('atkSpd', 0, 99, 30);
-            const atkHP = getInput('atkHP', 0, 99, 40);
-            const def = getInput('def', 0, 99, 30) + getInput('defBuff', -99, 99, 0);
-            const defSpd = getInput('defSpd', 0, 99, 25);
-            const defHP = getInput('defHP', 0, 99, 40);
+            const atk = getInput('atk', 0, 99, 0) + getInput('atkBuff', -99, 99, 0);
+            const atkSpd = getInput('atkSpd', 0, 99, 0);
+            const atkHP = getInput('atkHP', 0, 99, 0);
+            const atkMaxHP = getInput('atkMaxHP', 0, 99, atkHP); // Default to current HP if blank
+            const def = getInput('def', 0, 99, 0) + getInput('defBuff', -99, 99, 0);
+            const res = getInput('res', 0, 99, 0) + getInput('defBuff', -99, 99, 0);
+            const defSpd = getInput('defSpd', 0, 99, 0);
+            const defHP = getInput('defHP', 0, 99, 0);
+            const defMaxHP = getInput('defMaxHP', 0, 99, defHP);
             const damageType = document.getElementById('damageType').value;
             const weaponType = document.getElementById('weaponType').value;
             const triangle = document.getElementById('triangle').value;
             const effective = document.getElementById('effective').value;
             const special = document.getElementById('special').value;
             const trueDamage = getInput('trueDamage', 0, 99, 0);
+            const preCombatDamage = getInput('preCombatDamage', 0, 99, 0);
+            const unmitigated = document.getElementById('unmitigated').checked;
+            const emblemEffect = document.getElementById('emblemEffect').value;
+            const cantoDistance = getInput('cantoDistance', 0, 4, 0);
+            const cantoActive = document.getElementById('cantoActive').checked;
+            const pierceDR = getInput('pierceDR', 0, 100, 0);
             const critical = parseFloat(document.getElementById('critical').value);
             const terrain = document.getElementById('terrain').value;
             const percentReduction = getInput('percentReduction', 0, 100, 0);
             const fixedReduction = getInput('fixedReduction', 0, 99, 0);
+            const statCompare = document.getElementById('statCompare').value;
+            const hpThreshold = document.getElementById('hpThreshold').value;
+            const statConvertPercent = getInput('statConvertPercent', 0, 100, 0);
+            const statConvert = document.getElementById('statConvert').value;
+            const statScale = getInput('statScale', 0, 10, 0);
             const heavyBlade = document.getElementById('heavyBlade').checked;
             const deflectMagic = document.getElementById('deflectMagic').checked && damageType === 'magical';
+            const savior = document.getElementById('savior').checked;
+            const warpBubble = document.getElementById('warpBubble').checked;
+            const nullFollowUp = document.getElementById('nullFollowUp').checked;
+            const guaranteeFollowUp = document.getElementById('guaranteeFollowUp').checked;
+            const extraActions = getInput('extraActions', 0, 3, 0);
+            const galeforce = document.getElementById('galeforce').checked;
+            const divineVein = document.getElementById('divineVein').value;
             const counter = document.getElementById('counter').checked;
             const forecast = document.getElementById('forecast').checked;
 
-            log.push(`Attacker: Atk ${atk}, Spd ${atkSpd}, HP ${atkHP}`);
-            log.push(`Defender: ${damageType === 'physical' ? 'Def' : 'Res'} ${def}, Spd ${defSpd}, HP ${defHP}`);
+            if (atk === 0 || (def === 0 && res === 0)) {
+                log.push("Please enter Atk and at least one of Def or Res values.");
+                document.getElementById('result').innerText = `Damage: -`;
+                document.getElementById('log').innerHTML = log.map(step => `<p>${step}</p>`).join('');
+                return;
+            }
+
+            log.push(`Attacker: Atk ${atk}, Spd ${atkSpd}, HP ${atkHP}/${atkMaxHP}`);
+            log.push(`Defender: Def ${def}, Res ${res}, Spd ${defSpd}, HP ${defHP}/${defMaxHP}`);
 
             // Adaptive Damage
-            let effectiveDef = damageType === 'adaptive' ? Math.min(def, def) : def; // Placeholder for dual Def/Res in future
+            let effectiveDef = damageType === 'physical' ? def : damageType === 'magical' ? res : Math.min(def, res);
             log.push(`Effective ${damageType === 'physical' ? 'Def' : 'Res'}: ${effectiveDef}`);
+
+            // Pre-Combat Damage
+            let totalDamage = unmitigated ? preCombatDamage : Math.max(0, preCombatDamage - effectiveDef);
+            if (preCombatDamage > 0) log.push(`Pre-Combat Damage: ${totalDamage}${unmitigated ? ' (Unmitigated)' : ''}`);
+
+            // Emblem Effects
+            let drPierce = pierceDR / 100;
+            let counterAllowed = counter;
+            if (emblemEffect === 'ike') {
+                counterAllowed = true;
+                log.push("Emblem Ike: Nullifies counter disruption, 40% DR on first hit");
+            } else if (emblemEffect === 'lyn') {
+                totalDamage += 7;
+                log.push("Emblem Lyn: +7 True Damage");
+            }
+
+            // Canto
+            if (cantoActive) log.push(`Canto (${cantoDistance}): Unit can reposition`);
 
             // Core Modifiers
             let atkModified = applyTriangle(atk, triangle, log);
             atkModified = applyEffective(atkModified, effective, log);
             effectiveDef = applyTerrain(effectiveDef, terrain, log);
 
+            // Stat Comparison Boost
+            if (statCompare === 'atkVsDef') {
+                let boost = Math.floor(Math.max(0, atk - effectiveDef) / 5);
+                totalDamage += boost;
+                log.push(`Stat Comparison (Atk vs Def/Res): +${boost}`);
+            } else if (statCompare === 'spdVsSpd') {
+                let boost = Math.floor(Math.max(0, atkSpd - defSpd) / 5);
+                totalDamage += boost;
+                log.push(`Stat Comparison (Spd vs Spd): +${boost}`);
+            }
+
             // Base Damage
             let baseDamage = Math.max(0, atkModified - effectiveDef);
+            totalDamage += baseDamage;
             log.push(`Base Damage: ${baseDamage}`);
 
             // Special Damage
             let specialDamage = heavyBlade ? applySpecial(baseDamage, effectiveDef, special, damageType, log) : 0;
             if (heavyBlade && special !== 'none') log.push(`Heavy Blade: Special triggered`);
-            let damageWithSpecial = baseDamage + specialDamage;
+            totalDamage += specialDamage;
 
             // True Damage
             if (trueDamage > 0) {
-                damageWithSpecial += trueDamage;
+                totalDamage += trueDamage;
                 log.push(`True Damage: +${trueDamage}`);
+            }
+
+            // HP Threshold Modifier
+            let hpPercent = atkHP / atkMaxHP;
+            if (hpThreshold === 'high' && hpPercent >= 0.8) {
+                totalDamage += 5;
+                log.push(`High HP Threshold (≥80%): +5 Damage`);
+            } else if (hpThreshold === 'low' && hpPercent < 0.5) {
+                log.push("Low HP Threshold (<50%): +20% DR applied later");
+            }
+
+            // Stat-to-Damage Conversion
+            if (statConvertPercent > 0) {
+                let convertValue = statConvert === 'spd' ? atkSpd : effectiveDef;
+                let convertDamage = Math.floor(convertValue * (statConvertPercent / 100));
+                totalDamage += convertDamage;
+                log.push(`Stat Conversion (${statConvertPercent}% of ${statConvert}): +${convertDamage}`);
+            }
+
+            // Dynamic Stat Scaling
+            if (statScale > 0) {
+                let totalStats = atk + atkSpd + atkHP + def + res + defSpd + defHP;
+                let scaleDamage = Math.floor(totalStats / 10) * statScale;
+                totalDamage += scaleDamage;
+                log.push(`Dynamic Stat Scaling (${totalStats} total stats, ${statScale}/10): +${scaleDamage}`);
             }
 
             // Critical Multiplier
             if (critical > 1) {
-                damageWithSpecial = Math.floor(damageWithSpecial * critical);
-                log.push(`Critical (x${critical}): ${damageWithSpecial}`);
+                totalDamage = Math.floor(totalDamage * critical);
+                log.push(`Critical (x${critical}): ${totalDamage}`);
             }
 
             // Staff Modifier
             let staffMod = weaponType === 'staff' ? 0.5 : 1;
-            let damageAfterStaff = Math.floor(damageWithSpecial * staffMod);
-            if (weaponType === 'staff') log.push(`Staff Modifier (x0.5): ${damageAfterStaff}`);
+            totalDamage = Math.floor(totalDamage * staffMod);
+            if (weaponType === 'staff') log.push(`Staff Modifier (x0.5): ${totalDamage}`);
 
-            // Damage Reduction
-            let finalDamage = damageAfterStaff;
-            if (deflectMagic) {
-                finalDamage = Math.floor(finalDamage * 0.5);
-                log.push(`Deflect Magic (50% Reduction): ${finalDamage}`);
+            // Damage Reduction with Pierce
+            let totalReduction = percentReduction / 100;
+            if (deflectMagic) totalReduction += 0.5;
+            if (emblemEffect === 'ike') totalReduction += 0.4;
+            if (divineVein === 'stone') totalReduction += 0.2;
+            if (hpThreshold === 'low' && hpPercent < 0.5) totalReduction += 0.2;
+            if (savior) totalDamage -= 10;
+            if (totalReduction > 0) {
+                let piercedReduction = totalReduction * (1 - drPierce);
+                let originalDamage = totalDamage;
+                totalDamage = Math.floor(totalDamage * (1 - piercedReduction));
+                log.push(`Total Reduction (${Math.round(totalReduction * 100)}% pierced to ${Math.round(piercedReduction * 100)}%): ${totalDamage}`);
+                if (savior) log.push("Savior: Additional -10 damage");
             }
-            if (percentReduction > 0) {
-                finalDamage = Math.floor(finalDamage * (1 - percentReduction / 100));
-                log.push(`Percent Reduction (${percentReduction}%): ${finalDamage}`);
-            }
-            if (fixedReduction > 0) {
-                finalDamage = Math.max(0, finalDamage - fixedReduction);
-                log.push(`Fixed Reduction (${fixedReduction}): ${finalDamage}`);
-            }
+
+            // Warp Bubble
+            if (warpBubble) log.push("Warp Bubble: Enemy movement restricted");
 
             // Follow-Up Attack
-            let totalDamage = finalDamage;
-            if (atkSpd >= defSpd + 5) {
-                totalDamage += finalDamage;
-                log.push(`Follow-Up Attack (Spd ${atkSpd} vs ${defSpd}): +${finalDamage}`);
+            let hasFollowUp = false;
+            if (guaranteeFollowUp) {
+                hasFollowUp = true;
+                log.push("Guaranteed Follow-Up: Enabled");
+            } else if (!nullFollowUp && atkSpd >= defSpd + 5) {
+                hasFollowUp = true;
+                log.push(`Follow-Up Attack (Spd ${atkSpd} vs ${defSpd}): Enabled`);
+            }
+            if (hasFollowUp) {
+                totalDamage += totalDamage;
+                log.push(`Follow-Up Damage: +${totalDamage / 2}`);
+            } else if (nullFollowUp) {
+                log.push("Null Follow-Up: Prevents defender follow-up");
             }
 
-            // Counterattack (Simplified)
+            // Galeforce
+            if (galeforce && extraActions > 0) {
+                totalDamage *= (1 + extraActions);
+                log.push(`Galeforce: ${extraActions} extra actions, total damage x${1 + extraActions}`);
+            }
+
+            // Divine Vein (Flame)
+            if (divineVein === 'flame') {
+                totalDamage += 10;
+                log.push("Divine Vein (Flame): +10 True Damage");
+            }
+
+            // Counterattack
             let atkRemainingHP = atkHP;
             let defRemainingHP = defHP - totalDamage;
-            if (counter && defRemainingHP > 0) {
-                let counterDamage = Math.max(0, def - atk); // Simplified counter
+            if (counterAllowed && defRemainingHP > 0) {
+                let counterDef = damageType === 'physical' ? def : res;
+                let counterDamage = Math.max(0, counterDef - atk);
+                if (emblemEffect === 'ike') counterDamage = Math.floor(counterDamage * 0.6);
                 atkRemainingHP = Math.max(0, atkHP - counterDamage);
                 log.push(`Counterattack: ${counterDamage} to Attacker`);
             }
@@ -499,7 +699,7 @@
 
             // Combat Forecast
             if (forecast) {
-                let forecastDamage = Math.floor(damageWithSpecial * staffMod);
+                let forecastDamage = Math.floor((baseDamage + specialDamage + trueDamage) * staffMod);
                 log.push(`Combat Forecast: ${forecastDamage}`);
             }
 
@@ -508,7 +708,7 @@
         }
 
         function resetForm() {
-            document.querySelectorAll('input[type="number"]').forEach(input => input.value = input.defaultValue);
+            document.querySelectorAll('input[type="number"]').forEach(input => input.value = '');
             document.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
             document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => checkbox.checked = false);
             document.getElementById('result').innerText = `Damage: -`;
