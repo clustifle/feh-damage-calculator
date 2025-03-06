@@ -3,438 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FEH Damage Calculator - Stable</title>
+    <title>Windows 10X Calculator</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
+        /* Reset default styles and set up a centered layout */
+        * {
             margin: 0;
             padding: 0;
-            background-color: #F0F0F0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            transition: background-color 0.3s ease;
-            font-size: 16px;
-        }
-        body.dark-mode {
-            background-color: #202020;
-        }
-        .header {
-            background-color: #0078D7;
-            color: #FFFFFF;
-            padding: 10px 16px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s ease;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-        .header.dark-mode {
-            background-color: #1F1F1F;
-        }
-        .header-content {
-            flex-grow: 1;
-            text-align: center;
-        }
-        .hamburger {
-            font-size: 1.5rem;
-            cursor: pointer;
-            background: none;
-            border: none;
-            color: #FFFFFF;
-            padding: 0 10px;
-        }
-        .toggle-container {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .toggle-container span {
-            font-size: 0.9rem;
-            font-weight: 400;
-        }
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 40px;
-            height: 20px;
-        }
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #A6A6A6;
-            transition: background-color 0.3s ease;
-            border-radius: 20px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: -3px;
-            bottom: -3px;
-            background-color: #FFFFFF;
-            transition: transform 0.3s ease;
-            border-radius: 50%;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-        }
-        input:checked + .slider {
-            background-color: #0078D7;
-        }
-        input:checked + .slider:before {
-            transform: translateX(23px);
-        }
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: -100%; /* Changed to ensure full hide */
-            width: 250px;
-            height: 100%;
-            background-color: #FFFFFF;
-            transition: left 0.3s ease;
-            z-index: 1001;
-            padding: 16px;
-            box-shadow: 2px 0 6px rgba(0, 0, 0, 0.1);
-        }
-        .sidebar.open {
-            left: 0;
-        }
-        .sidebar.dark-mode {
-            background-color: #292929;
-        }
-        .sidebar .toggle-container {
-            margin-top: 20px;
-        }
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: none;
-            z-index: 1000;
-        }
-        .overlay.active {
-            display: block;
-        }
-        .container {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            overflow: hidden;
-            background-color: #FFFFFF;
-            transition: background-color 0.3s ease;
-        }
-        .container.dark-mode {
-            background-color: #292929;
-        }
-        .input-panel {
-            background-color: rgba(255, 255, 255, 0.95);
-            padding: 16px;
-            overflow-y: auto;
-            transition: background-color 0.3s ease;
-        }
-        .input-panel.dark-mode {
-            background-color: rgba(41, 41, 41, 0.95);
-        }
-        .result-panel {
-            padding: 16px;
-            background-color: transparent;
-            overflow-y: auto;
-        }
-        .section {
-            margin-bottom: 16px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-            transition: border-color 0.3s ease;
-        }
-        .section.dark-mode {
-            border-color: rgba(255, 255, 255, 0.1);
-        }
-        .section-header {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #1A1A1A;
-            padding: 12px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: color 0.3s ease, background-color 0.2s ease;
-            cursor: pointer;
-        }
-        .section-header:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-        .section-header.dark-mode {
-            color: #F0F0F0;
-        }
-        .section-header.dark-mode:hover {
-            background-color: rgba(255, 255, 255, 0.05);
-        }
-        .section-content {
-            padding: 0 8px 12px;
-            transition: max-height 0.3s ease, opacity 0.3s ease;
-            opacity: 1;
-        }
-        .section-content.collapsible {
-            max-height: 600px;
-            overflow: hidden;
-        }
-        .section-content.collapsible.collapsed {
-            max-height: 0;
-            opacity: 0;
-            padding: 0 8px;
-        }
-        .section-content.scrollable {
-            max-height: 40vh;
-            overflow-y: auto;
-            padding: 0 8px 12px;
-        }
-        .input-field, .select-field {
-            margin-bottom: 16px;
-            width: 100%;
-            position: relative;
-        }
-        .input-field label, .select-field label {
-            display: block;
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 6px;
-            cursor: help;
-            transition: color 0.3s ease;
-        }
-        .input-field label.dark-mode, .select-field label.dark-mode {
-            color: #B3B3B3;
-        }
-        .input-field input, .select-field select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #D1D1D1;
-            font-size: 1rem;
-            font-family: 'Segoe UI', Arial, sans-serif;
             box-sizing: border-box;
-            transition: border-color 0.2s ease, background-color 0.3s ease, color 0.3s ease;
-            background-color: #FFFFFF;
-            color: #1A1A1A;
-            border-radius: 4px;
-            min-height: 48px;
-        }
-        .input-field input:focus, .select-field select:focus {
-            border-color: #0078D7;
-            outline: none;
-            box-shadow: 0 0 0 2px #0078D7;
-        }
-        .input-field input.dark-mode, .select-field select.dark-mode {
-            background-color: #333333;
-            border-color: #555555;
-            color: #F0F0F0;
-        }
-        .button {
-            width: 100%;
-            padding: 14px;
-            background-color: #0078D7;
-            color: #FFFFFF;
-            border: none;
-            font-size: 1rem;
             font-family: 'Segoe UI', Arial, sans-serif;
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: background-color 0.2s ease;
-            margin-bottom: 12px;
-            min-height: 48px;
         }
-        .button:hover {
-            background-color: #0063B1;
-        }
-        .button.dark-mode {
-            background-color: #0078D7;
-        }
-        .button.dark-mode:hover {
-            background-color: #0063B1;
-        }
-        .preset-controls {
+
+        body {
             display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-        .preset-input-group {
-            display: flex;
-            flex-direction: row;
-            gap: 8px;
+            justify-content: center;
             align-items: center;
+            min-height: 100vh;
+            background: #f0f2f5; /* Light gray background like Windows 10X */
         }
-        .preset-input {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid #D1D1D1;
-            font-size: 1rem;
-            border-radius: 4px;
+
+        /* Calculator container with Windows 10X styling */
+        .calculator {
+            width: 340px;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 20px;
         }
-        .save-button, .load-button {
-            padding: 12px 16px;
-            background-color: #0078D7;
-            color: #FFFFFF;
+
+        /* Display area */
+        .display {
+            width: 100%;
+            height: 80px;
+            background: #f8f9fa;
             border: none;
-            font-size: 1rem;
-            font-weight: 600;
+            border-radius: 8px;
+            padding: 20px;
+            font-size: 28px;
+            text-align: right;
+            color: #1a1a1a;
+            outline: none;
+            margin-bottom: 20px;
+        }
+
+        /* Button grid */
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        /* Button styling with Windows 10X flair */
+        button {
+            width: 70px;
+            height: 70px;
+            font-size: 20px;
+            border: none;
+            border-radius: 50%;
+            background: #f1f3f4;
+            color: #333;
             cursor: pointer;
-            border-radius: 4px;
-            transition: background-color 0.2s ease;
-        }
-        .save-button:hover, .load-button:hover {
-            background-color: #0063B1;
-        }
-        .save-button.dark-mode, .load-button.dark-mode {
-            background-color: #0078D7;
-        }
-        .save-button.dark-mode:hover, .load-button.dark-mode:hover {
-            background-color: #0063B1;
-        }
-        #result {
-            background-color: rgba(255, 255, 255, 0.95);
-            padding: 16px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            font-size: 0.9rem;
-            line-height: 1.6;
-            color: #1A1A1A;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            border-radius: 4px;
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-        }
-        #result.dark-mode {
-            background-color: rgba(41, 41, 41, 0.95);
-            color: #F0F0F0;
-            border-color: rgba(255, 255, 255, 0.1);
-        }
-        #result strong {
-            color: #0078D7;
-        }
-        .hover-label:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
-        }
-        .tooltiptext {
-            visibility: hidden;
-            width: 90%;
-            max-width: 320px;
-            background-color: rgba(0, 0, 0, 0.9);
-            color: #FFFFFF;
-            text-align: left;
-            border-radius: 4px;
-            padding: 10px;
-            position: absolute;
-            z-index: 1;
-            top: 100%;
-            left: 0;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            font-size: 0.85rem;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        .dark-mode .tooltiptext {
-            background-color: rgba(85, 85, 85, 0.9);
+            transition: background 0.2s, transform 0.1s;
         }
 
-        /* Tablet (768px - 1024px) */
-        @media (min-width: 768px) and (max-width: 1024px) {
-            .hamburger, .sidebar, .overlay { display: none; }
-            .container { flex-direction: row; }
-            .input-panel { width: 40%; min-width: 360px; border-right: 1px solid rgba(0, 0, 0, 0.1); }
-            .input-panel.dark-mode { border-color: rgba(255, 255, 255, 0.1); }
-            .result-panel { width: 60%; }
-            .section-content.scrollable { max-height: 50vh; }
-            .preset-controls { flex-wrap: nowrap; }
-            #presetName { width: 50%; }
-            .header .toggle-container { display: flex; }
-            .header-content { text-align: center; }
+        button:hover {
+            background: #e8eaed;
         }
 
-        /* Desktop (>1024px) */
-        @media (min-width: 1025px) {
-            .hamburger, .sidebar, .overlay { display: none; }
-            .container { flex-direction: row; }
-            .input-panel { width: 480px; border-right: 1px solid rgba(0, 0, 0, 0.1); }
-            .input-panel.dark-mode { border-color: rgba(255, 255, 255, 0.1); }
-            .section-content.scrollable { max-height: 300px; }
-            .preset-controls { flex-wrap: nowrap; }
-            #presetName { width: 60%; }
-            .header .toggle-container { display: flex; }
-            .header-content { text-align: center; }
+        button:active {
+            transform: scale(0.95);
         }
 
-        /* Mobile (<768px) */
-        @media (max-width: 767px) {
-            .header .toggle-container { display: none; }
-            .section-content.scrollable { max-height: 30vh; }
-            .hamburger { display: block; }
-            .sidebar { display: block; }
-            .overlay { display: none; }
-            .header-content { text-align: center; flex-grow: 1; }
+        /* Operator buttons */
+        .operator {
+            background: #0078d4; /* Windows blue */
+            color: #fff;
+        }
+
+        .operator:hover {
+            background: #005ea2;
+        }
+
+        /* Special buttons (Clear, Equals) */
+        .clear {
+            background: #d93025; /* Red for clear */
+            color: #fff;
+        }
+
+        .clear:hover {
+            background: #b5261e;
+        }
+
+        .equals {
+            background: #0078d4;
+            color: #fff;
+        }
+
+        .equals:hover {
+            background: #005ea2;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <button class="hamburger" onclick="toggleSidebar()">☰</button>
-        <div class="header-content">FEH Damage Calculator</div>
-        <div class="toggle-container">
-            <span>Dark Mode</span>
-            <label class="toggle-switch">
-                <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
-                <span class="slider"></span>
-            </label>
+    <div class="calculator">
+        <input type="text" class="display" id="display" readonly>
+        <div class="buttons">
+            <button class="clear" onclick="clearDisplay()">C</button>
+            <button class="operator" onclick="appendToDisplay('/')">/</button>
+            <button class="operator" onclick="appendToDisplay('*')">×</button>
+            <button class="operator" onclick="appendToDisplay('-')">−</button>
+            <button onclick="appendToDisplay('7')">7</button>
+            <button onclick="appendToDisplay('8')">8</button>
+            <button onclick="appendToDisplay('9')">9</button>
+            <button class="operator" onclick="appendToDisplay('+')">+</button>
+            <button onclick="appendToDisplay('4')">4</button>
+            <button onclick="appendToDisplay('5')">5</button>
+            <button onclick="appendToDisplay('6')">6</button>
+            <button onclick="appendToDisplay('.')">.</button>
+            <button onclick="appendToDisplay('1')">1</button>
+            <button onclick="appendToDisplay('2')">2</button>
+            <button onclick="appendToDisplay('3')">3</button>
+            <button onclick="appendToDisplay('0')">0</button>
+            <button class="equals" onclick="calculate()">=</button>
         </div>
     </div>
-    <div class="sidebar" id="sidebar">
-        <div class="toggle-container">
-            <span>Dark Mode</span>
-            <label class="toggle-switch">
-                <input type="checkbox" id="mobileDarkModeToggle" onchange="toggleDarkMode()">
-                <span class="slider"></span>
-            </label>
-        </div>
-    </div>
-    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
-    <div class="container">
-        <div class="input-panel">
-            <form id="damageForm" onsubmit="calculateDamage(event)">
-                <div class="preset-controls">
-                    <div class="preset-input-group">
-                        <input type="text" id="presetName" placeholder="Enter Preset Name" class="preset-input">
-                        <button type="button" class="button save-button" onclick="savePreset()">Save</button>
-                        <button type="button" class="button load-button" onclick="loadPreset()">Load</button>
-                    </div>
-                </div>
 
-                <div class="section">
-                    <div class="section-header" onclick="toggleSection(this)">
-                        <span class="hover-label">Attacker Stats <span class="tooltiptext">Core stats and type for the attacking unit.</span></span>
-                        <span>▼</span>
-                    </div>
-                    <div class="section-content scrollable collapsible">
-                        <div class="input-field"><label class="hover-label">HP <span class="tooltiptext">The unit's starting health points.</span></label><input type="number" id="hpAtk" min="1"></div>
-                        <div class="input-field"><label class="hover-label">Visible Atk <span class="tooltiptext">The unit's base attack stat.</span></label><input type="number" id="atk" min="0"></div>
-                        <div class="input-field"><label class="hover-label">Visible Spd <span class="tooltiptext">The unit's base speed stat.</span></label><input type="number" id="spd" min="0"></div>
-                        <div class="input-field"><label class="hover-label">Visible Def <span class="tooltiptext">The unit's base defense stat.</span></label><input type="number" id="defAtk" min="0"></div>
-                        <div class="input-field"><label class="hover-label">Visible Res <span class="tooltiptext">The unit's base resistance stat.</span></label><input type="number" id="resAtk" min="0"></div>
-                        <div class="input-field"><label class="hover-label">Temp HP Bonus <span class="tooltiptext">Temporary HP bonus added before combat.</span></label><input type="number" id="tempHpAtk" min="0"></div>
-                        <div class="input-field"><label class="hover-label">Temp Atk Bonus <span class="tooltiptext">Temporary attack bonus.</span></label><input type="number" id="tempAtk" min="0"></div>
-                        <div class="input-field"><label class="hover-label">Temp Spd Bonus <span class="tooltiptext">Temporary speed bonus.</span></label><input type="number" id="tempSpd" min="0"></div>
-                        <div class="input-field"><label class="hover-label">Temp Def Bonus <span class="tooltiptext">Temporary defense bonus.</span></label><input type="number" id="tempDefAtk" min="0"></div>
-                        <div class="input-field"><label class="hover-label">Temp Res Bonus <span class="tooltiptext">Temporary resistance bonus.</span></label><input type="number" id="tempResAtk" min="0"></div>
-                        <div class="select-field"><label class="hover-label">Damage Type <span class="tooltiptext">Physical (Def), Magical (Res), or Adaptive (Lower).</span></label><select id="damageType"><option value="physical">Physical</option><option value="magical">Mag
+    <script>
+        let display = document.getElementById('display');
+
+        function appendToDisplay(value) {
+            display.value += value;
+        }
+
+        function clearDisplay() {
+            display.value = '';
+        }
+
+        function calculate() {
+            try {
+                display.value = eval(display.value.replace('×', '*').replace('−', '-'));
+            } catch (error) {
+                display.value = 'Error';
+                setTimeout(clearDisplay, 1000); // Clear error after 1 second
+            }
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', (event) => {
+            const key = event.key;
+            if (/[0-9]/.test(key)) appendToDisplay(key);
+            if (key === '.') appendToDisplay('.');
+            if (key === '+') appendToDisplay('+');
+            if (key === '-') appendToDisplay('−');
+            if (key === '*') appendToDisplay('×');
+            if (key === '/') appendToDisplay('/');
+            if (key === 'Enter') calculate();
+            if (key === 'Escape') clearDisplay();
+        });
+    </script>
+</body>
+</html>
