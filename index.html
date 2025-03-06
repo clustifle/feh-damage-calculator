@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Windows 10X Calculator</title>
+    <title>FEH Damage Calculator </title>
     <style>
-        /* Reset default styles and set up a centered layout */
         * {
             margin: 0;
             padding: 0;
@@ -18,148 +17,143 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: #f0f2f5; /* Light gray background like Windows 10X */
+            background: #f0f2f5;
         }
 
-        /* Calculator container with Windows 10X styling */
         .calculator {
-            width: 340px;
+            width: 400px;
             background: #ffffff;
             border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
             padding: 20px;
         }
 
-        /* Display area */
-        .display {
-            width: 100%;
-            height: 80px;
-            background: #f8f9fa;
-            border: none;
-            border-radius: 8px;
-            padding: 20px;
-            font-size: 28px;
-            text-align: right;
+        h1 {
+            font-size: 24px;
             color: #1a1a1a;
-            outline: none;
+            text-align: center;
             margin-bottom: 20px;
         }
 
-        /* Button grid */
-        .buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
+        .section {
+            margin-bottom: 20px;
         }
 
-        /* Button styling with Windows 10X flair */
-        button {
-            width: 70px;
-            height: 70px;
-            font-size: 20px;
-            border: none;
-            border-radius: 50%;
-            background: #f1f3f4;
+        label {
+            display: block;
+            font-size: 14px;
             color: #333;
+            margin-bottom: 5px;
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #d1d3d4;
+            border-radius: 8px;
+            background: #f8f9fa;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="number"]:focus, select:focus {
+            border-color: #0078d4;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            background: #0078d4;
+            color: #fff;
             cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
+            transition: background 0.2s;
         }
 
         button:hover {
-            background: #e8eaed;
-        }
-
-        button:active {
-            transform: scale(0.95);
-        }
-
-        /* Operator buttons */
-        .operator {
-            background: #0078d4; /* Windows blue */
-            color: #fff;
-        }
-
-        .operator:hover {
             background: #005ea2;
         }
 
-        /* Special buttons (Clear, Equals) */
-        .clear {
-            background: #d93025; /* Red for clear */
-            color: #fff;
-        }
-
-        .clear:hover {
-            background: #b5261e;
-        }
-
-        .equals {
-            background: #0078d4;
-            color: #fff;
-        }
-
-        .equals:hover {
-            background: #005ea2;
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #1a1a1a;
+            text-align: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
         }
     </style>
 </head>
 <body>
     <div class="calculator">
-        <input type="text" class="display" id="display" readonly>
-        <div class="buttons">
-            <button class="clear" onclick="clearDisplay()">C</button>
-            <button class="operator" onclick="appendToDisplay('/')">/</button>
-            <button class="operator" onclick="appendToDisplay('*')">×</button>
-            <button class="operator" onclick="appendToDisplay('-')">−</button>
-            <button onclick="appendToDisplay('7')">7</button>
-            <button onclick="appendToDisplay('8')">8</button>
-            <button onclick="appendToDisplay('9')">9</button>
-            <button class="operator" onclick="appendToDisplay('+')">+</button>
-            <button onclick="appendToDisplay('4')">4</button>
-            <button onclick="appendToDisplay('5')">5</button>
-            <button onclick="appendToDisplay('6')">6</button>
-            <button onclick="appendToDisplay('.')">.</button>
-            <button onclick="appendToDisplay('1')">1</button>
-            <button onclick="appendToDisplay('2')">2</button>
-            <button onclick="appendToDisplay('3')">3</button>
-            <button onclick="appendToDisplay('0')">0</button>
-            <button class="equals" onclick="calculate()">=</button>
+        <h1>FEH Damage Calculator</h1>
+        <div class="section">
+            <label>Attacker's Atk</label>
+            <input type="number" id="atk" min="0" value="50">
         </div>
+        <div class="section">
+            <label>Defender's Def/Res</label>
+            <input type="number" id="def" min="0" value="30">
+        </div>
+        <div class="section">
+            <label>Damage Type</label>
+            <select id="damageType">
+                <option value="physical">Physical (Def)</option>
+                <option value="magical">Magical (Res)</option>
+            </select>
+        </div>
+        <div class="section">
+            <label>Weapon Triangle</label>
+            <select id="triangle">
+                <option value="neutral">Neutral (0%)</option>
+                <option value="advantage">Advantage (+20%)</option>
+                <option value="disadvantage">Disadvantage (-20%)</option>
+            </select>
+        </div>
+        <div class="section">
+            <label>Effective Damage</label>
+            <select id="effective">
+                <option value="no">No (x1)</option>
+                <option value="yes">Yes (x1.5)</option>
+            </select>
+        </div>
+        <button onclick="calculateDamage()">Calculate Damage</button>
+        <div id="result">Damage: -</div>
     </div>
 
     <script>
-        let display = document.getElementById('display');
+        function calculateDamage() {
+            // Get input values
+            const atk = parseInt(document.getElementById('atk').value) || 0;
+            const def = parseInt(document.getElementById('def').value) || 0;
+            const damageType = document.getElementById('damageType').value;
+            const triangle = document.getElementById('triangle').value;
+            const effective = document.getElementById('effective').value;
 
-        function appendToDisplay(value) {
-            display.value += value;
-        }
-
-        function clearDisplay() {
-            display.value = '';
-        }
-
-        function calculate() {
-            try {
-                display.value = eval(display.value.replace('×', '*').replace('−', '-'));
-            } catch (error) {
-                display.value = 'Error';
-                setTimeout(clearDisplay, 1000); // Clear error after 1 second
+            // Step 1: Apply Weapon Triangle modifier
+            let atkModified = atk;
+            if (triangle === 'advantage') {
+                atkModified = Math.floor(atk * 1.2);
+            } else if (triangle === 'disadvantage') {
+                atkModified = Math.floor(atk * 0.8);
             }
-        }
 
-        // Keyboard support
-        document.addEventListener('keydown', (event) => {
-            const key = event.key;
-            if (/[0-9]/.test(key)) appendToDisplay(key);
-            if (key === '.') appendToDisplay('.');
-            if (key === '+') appendToDisplay('+');
-            if (key === '-') appendToDisplay('−');
-            if (key === '*') appendToDisplay('×');
-            if (key === '/') appendToDisplay('/');
-            if (key === 'Enter') calculate();
-            if (key === 'Escape') clearDisplay();
-        });
+            // Step 2: Apply Effective Damage
+            if (effective === 'yes') {
+                atkModified = Math.floor(atkModified * 1.5);
+            }
+
+            // Step 3: Calculate base damage
+            let damage = atkModified - def;
+            if (damage < 0) damage = 0;
+
+            // Display result
+            document.getElementById('result').innerText = `Damage: ${damage}`;
+        }
     </script>
 </body>
 </html>
