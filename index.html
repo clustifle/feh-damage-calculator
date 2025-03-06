@@ -268,9 +268,42 @@
         }
         .preset-controls {
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
             gap: 8px;
             margin-bottom: 16px;
+        }
+        .preset-input-group {
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+            align-items: center;
+        }
+        .preset-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #D1D1D1;
+            font-size: 1rem;
+            border-radius: 4px;
+        }
+        .save-button, .load-button {
+            padding: 12px 16px;
+            background-color: #0078D7;
+            color: #FFFFFF;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+        .save-button:hover, .load-button:hover {
+            background-color: #0063B1;
+        }
+        .save-button.dark-mode, .load-button.dark-mode {
+            background-color: #0078D7;
+        }
+        .save-button.dark-mode:hover, .load-button.dark-mode:hover {
+            background-color: #0063B1;
         }
         #result {
             background-color: rgba(255, 255, 255, 0.95);
@@ -381,9 +414,11 @@
         <div class="input-panel">
             <form id="damageForm" onsubmit="calculateDamage(event)">
                 <div class="preset-controls">
-                    <input type="text" id="presetName" placeholder="Preset Name">
-                    <button type="button" class="button" onclick="savePreset()">Save Preset</button>
-                    <button type="button" class="button" onclick="loadPreset()">Load Preset</button>
+                    <div class="preset-input-group">
+                        <input type="text" id="presetName" placeholder="Enter Preset Name" class="preset-input">
+                        <button type="button" class="button save-button" onclick="savePreset()">Save</button>
+                        <button type="button" class="button load-button" onclick="loadPreset()">Load</button>
+                    </div>
                 </div>
 
                 <div class="section">
@@ -392,495 +427,14 @@
                         <span>▼</span>
                     </div>
                     <div class="section-content scrollable collapsible">
-                        <div class="input-field"><label class="hover-label">HP <span class="tooltiptext">The unit's starting health points.</span></label><input type="number" id="hpAtk" min="1" value="40" required></div>
-                        <div class="input-field"><label class="hover-label">Visible Atk <span class="tooltiptext">The unit's base attack stat.</span></label><input type="number" id="atk" min="0" value="50" required></div>
-                        <div class="input-field"><label class="hover-label">Visible Spd <span class="tooltiptext">The unit's base speed stat.</span></label><input type="number" id="spd" min="0" value="35" required></div>
-                        <div class="input-field"><label class="hover-label">Visible Def <span class="tooltiptext">The unit's base defense stat.</span></label><input type="number" id="defAtk" min="0" value="25" required></div>
-                        <div class="input-field"><label class="hover-label">Visible Res <span class="tooltiptext">The unit's base resistance stat.</span></label><input type="number" id="resAtk" min="0" value="20" required></div>
-                        <div class="input-field"><label class="hover-label">Temp HP Bonus <span class="tooltiptext">Temporary HP bonus added before combat.</span></label><input type="number" id="tempHpAtk" min="0" value="0"></div>
-                        <div class="input-field"><label class="hover-label">Temp Atk Bonus <span class="tooltiptext">Temporary attack bonus.</span></label><input type="number" id="tempAtk" min="0" value="0"></div>
-                        <div class="input-field"><label class="hover-label">Temp Spd Bonus <span class="tooltiptext">Temporary speed bonus.</span></label><input type="number" id="tempSpd" min="0" value="0"></div>
-                        <div class="input-field"><label class="hover-label">Temp Def Bonus <span class="tooltiptext">Temporary defense bonus.</span></label><input type="number" id="tempDefAtk" min="0" value="0"></div>
-                        <div class="input-field"><label class="hover-label">Temp Res Bonus <span class="tooltiptext">Temporary resistance bonus.</span></label><input type="number" id="tempResAtk" min="0" value="0"></div>
-                        <div class="select-field"><label class="hover-label">Damage Type <span class="tooltiptext">Physical (Def), Magical (Res), or Adaptive (Lower).</span></label><select id="damageType"><option value="physical" selected>Physical (Def)</option><option value="magical">Magical (Res)</option><option value="adaptive">Adaptive (Lower)</option></select></div>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <div class="section-header" onclick="toggleSection(this)">
-                        <span class="hover-label">Defender Stats <span class="tooltiptext">Core stats and conditions for the defending unit.</span></span>
-                        <span>▼</span>
-                    </div>
-                    <div class="section-content scrollable collapsible">
-                        <div class="input-field"><label class="hover-label">HP <span class="tooltiptext">The unit's starting health points.</span></label><input type="number" id="hpDef" min="1" value="45" required></div>
-                        <div class="input-field"><label class="hover-label">Visible Atk <span class="tooltiptext">The unit's base attack stat.</span></label><input type="number" id="atkDef" min="0" value="45" required></div>
-                        <div class="input-field"><label class="hover-label">Visible Spd <span class="tooltiptext">The unit's base speed stat.</span></label><input type="number" id="spdDef" min="0" value="30" required></div>
-                        <div class="input-field"><label class="hover-label">Visible Def <span class="tooltiptext">The unit's base defense stat.</span></label><input type="number" id="def" min="0" value="30" required></div>
-                        <div class="input-field"><label class="hover-label">Visible Res <span class="tooltiptext">The unit's base resistance stat.</span></label><input type="number" id="res" min="0" value="25" required></div>
-                        <div class="input-field"><label class="hover-label">Temp HP Bonus <span class="tooltiptext">Temporary HP bonus added before combat.</span></label><input type="number" id="tempHpDef" min="0" value="0"></div>
-                        <div class="input-field"><label class="hover-label">Temp Atk Bonus <span class="tooltiptext">Temporary attack bonus.</span></label><input type="number" id="tempAtkDef" min="0" value="0"></div>
-                        <div class="input-field"><label class="hover-label">Temp Spd Bonus <span class="tooltiptext">Temporary speed bonus.</span></label><input type="number" id="tempSpdDef" min="0" value="0"></div>
-                        <div class="input-field"><label class="hover-label">Temp Def Bonus <span class="tooltiptext">Temporary defense bonus.</span></label><input type="number" id="tempDef" min="0" value="0"></div>
-                        <div class="input-field"><label class="hover-label">Temp Res Bonus <span class="tooltiptext">Temporary resistance bonus.</span></label><input type="number" id="tempResDef" min="0" value="0"></div>
-                        <div class="select-field"><label class="hover-label">Terrain <span class="tooltiptext">Defensive terrain increases Def/Res by 30%.</span></label><select id="terrain"><option value="no" selected>No</option><option value="yes">Defensive (+30%)</option></select></div>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <div class="section-header" onclick="toggleSection(this)">
-                        <span class="hover-label">Combat Modifiers <span class="tooltiptext">Factors affecting damage and combat flow.</span></span>
-                        <span>▼</span>
-                    </div>
-                    <div class="section-content scrollable collapsible">
-                        <div class="select-field"><label class="hover-label">Weapon Triangle <span class="tooltiptext">Advantage (+20%), disadvantage (-20%).</span></label><select id="advantage"><option value="neutral" selected>Neutral</option><option value="advantage">Advantage (+20%)</option><option value="disadvantage">Disadvantage (-20%)</option></select></div>
-                        <div class="select-field"><label class="hover-label">Effectiveness <span class="tooltiptext">Increases Atk by 50% against specific types.</span></label><select id="effective"><option value="no" selected>No</option><option value="yes">Yes (+50%)</option></select></div>
-                        <div class="select-field"><label class="hover-label">Hits per Attack <span class="tooltiptext">Number of hits per attack phase.</span></label><select id="hits"><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
-                        <div class="select-field"><label class="hover-label">Attacker Special <span class="tooltiptext">Special skill used by the attacker.</span></label><select id="attackerSpecial"><option value="none" selected>None</option><option value="aether">Aether</option><option value="galeforce">Galeforce</option><option value="dragonFang">Dragon Fang</option><option value="luna">Luna</option><option value="rupturedSky">Ruptured Sky</option><option value="deadeye">Deadeye</option><option value="vitalAstra">Vital Astra</option><option value="iceberg">Iceberg</option><option value="bonfire">Bonfire</option><option value="glimmer">Glimmer</option><option value="moonbow">Moonbow</option></select></div>
-                        <div class="input-field"><label class="hover-label">Starting Cooldown (Attacker) <span class="tooltiptext">Initial cooldown value.</span></label><input type="number" id="specialCdStart" min="0" value="3"></div>
-                        <div class="select-field"><label class="hover-label">Defender Special <span class="tooltiptext">Special skill used by the defender.</span></label><select id="defenderSpecial"><option value="none" selected>None</option><option value="aether">Aether</option><option value="galeforce">Galeforce</option><option value="dragonFang">Dragon Fang</option><option value="luna">Luna</option><option value="rupturedSky">Ruptured Sky</option><option value="deadeye">Deadeye</option><option value="vitalAstra">Vital Astra</option><option value="iceberg">Iceberg</option><option value="bonfire">Bonfire</option><option value="glimmer">Glimmer</option><option value="moonbow">Moonbow</option></select></div>
-                        <div class="input-field"><label class="hover-label">Starting Cooldown (Defender) <span class="tooltiptext">Initial cooldown for defender’s special.</span></label><input type="number" id="specialCdStartDef" min="0" value="3"></div>
-                        <div class="input-field"><label class="hover-label">True Damage (Post-Combat) <span class="tooltiptext">Damage applied after combat.</span></label><input type="number" id="trueDamage" min="0" value="0"></div>
-                        <div class="input-field"><label class="hover-label">Fixed Damage <span class="tooltiptext">Flat damage added per hit.</span></label><input type="number" id="fixed" min="0" value="0"></div>
-                        <div class="select-field"><label class="hover-label">Staff <span class="tooltiptext">Halves final damage if staff.</span></label><select id="staff"><option value="no" selected>No</option><option value="yes">Yes (50%)</option></select></div>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <div class="section-header" onclick="toggleSection(this)">
-                        <span class="hover-label">Skill Effects <span class="tooltiptext">Skills that modify combat mechanics.</span></span>
-                        <span>▼</span>
-                    </div>
-                    <div class="section-content scrollable collapsible">
-                        <div class="select-field"><label class="hover-label">Follow-Up (Attacker) <span class="tooltiptext">Controls attacker follow-up.</span></label><select id="followUpAtk"><option value="normal" selected>Normal</option><option value="guaranteed">Guaranteed</option><option value="denied">Denied</option><option value="null">Null Follow-Up</option></select></div>
-                        <div class="select-field"><label class="hover-label">Follow-Up (Defender) <span class="tooltiptext">Controls defender follow-up.</span></label><select id="followUpDef"><option value="normal" selected>Normal</option><option value="guaranteed">Guaranteed</option><option value="denied">Denied</option><option value="null">Null Follow-Up</option></select></div>
-                        <div class="select-field"><label class="hover-label">Pierce Reduction <span class="tooltiptext">Reduces or ignores % damage reduction.</span></label><select id="pierce"><option value="no" selected>No</option><option value="half">Half (50%)</option><option value="yes">Full</option></select></div>
-                        <div class="select-field"><label class="hover-label">Heavy Blade (Attacker) <span class="tooltiptext">+1 charge/hit if Atk > foe’s stat.</span></label><select id="heavyBlade"><option value="no" selected>No</option><option value="yes">Yes (+1 Charge/Hit)</option></select></div>
-                        <div class="select-field"><label class="hover-label">Special Spiral (Attacker) <span class="tooltiptext">Reduces CD by 2 after triggering.</span></label><select id="specialSpiral"><option value="no" selected>No</option><option value="yes">Yes (+2 Post-Special)</option></select></div>
-                        <div class="select-field"><label class="hover-label">Guard (Defender) <span class="tooltiptext">Slows attacker’s special charge.</span></label><select id="guard"><option value="no" selected>No</option><option value="yes">Yes (Slows Charge)</option></select></div>
-                        <div class="input-field"><label class="hover-label">Atk Boost <span class="tooltiptext">Flat increase to Atk.</span></label><input type="number" id="atkBoost" min="0" value="0"></div>
-                        <div class="input-field"><label class="hover-label">Def/Res Reduction <span class="tooltiptext">Reduces foe’s Def or Res.</span></label><input type="number" id="defReduction" min="0" value="0"></div>
-                        <div class="select-field"><label class="hover-label">Time’s Pulse (Attacker) <span class="tooltiptext">Reduces starting CD by 1 if max.</span></label><select id="timesPulse"><option value="no" selected>No</option><option value="yes">Yes (-1 CD Start)</option></select></div>
-                        <div class="select-field"><label class="hover-label">Infantry Pulse (Attacker) <span class="tooltiptext">Reduces starting CD by 1 per ally.</span></label><select id="infantryPulse"><option value="0" selected>0 Allies</option><option value="1">1 Ally</option><option value="2">2 Allies</option><option value="3">3 Allies</option></select></div>
-                        <div class="select-field"><label class="hover-label">Wrath (Attacker) <span class="tooltiptext">+10 special damage when HP ≤ 75%.</span></label><select id="wrath"><option value="no" selected>No</option><option value="yes">Yes (+10 Special Damage)</option></select></div>
-                        <div class="input-field"><label class="hover-label">Special Damage % Boost <span class="tooltiptext">Percentage boost to special damage.</span></label><input type="number" id="specialPercentBoost" min="0" max="100" value="0"></div>
-                        <div class="select-field"><label class="hover-label">Neutralize Penalties (Attacker) <span class="tooltiptext">Negates stat penalties.</span></label><select id="neutralizePenalties"><option value="no" selected>No</option><option value="yes">Yes</option></select></div>
-                        <div class="select-field"><label class="hover-label">Null C-Disrupt (Attacker) <span class="tooltiptext">Prevents defender counter.</span></label><select id="nullCDisrupt"><option value="no" selected>No</option><option value="yes">Yes</option></select></div>
-                        <div class="select-field"><label class="hover-label">Hardy Bearing (Defender) <span class="tooltiptext">Disables attacker priority.</span></label><select id="hardyBearing"><option value="no" selected>No</option><option value="yes">Yes</option></select></div>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <div class="section-header" onclick="toggleSection(this)">
-                        <span class="hover-label">Damage Reduction <span class="tooltiptext">Defender’s % damage mitigation.</span></span>
-                        <span>▼</span>
-                    </div>
-                    <div class="section-content collapsible">
-                        <div class="input-field"><label class="hover-label">Reduction 1 (%) <span class="tooltiptext">First % reduction.</span></label><input type="number" id="reduction1" min="0" max="100" value="0"></div>
-                        <div class="input-field"><label class="hover-label">Reduction 2 (%) <span class="tooltiptext">Second % reduction.</span></label><input type="number" id="reduction2" min="0" max="100" value="0"></div>
-                        <div class="input-field"><label class="hover-label">Reduction 3 (%) <span class="tooltiptext">Third % reduction.</span></label><input type="number" id="reduction3" min="0" max="100" value="0"></div>
-                        <div class="select-field"><label class="hover-label">Miracle <span class="tooltiptext">Survive lethal hit with 1 HP if HP > 1.</span></label><select id="miracle"><option value="no" selected>No</option><option value="yes">Yes (Survive with 1 HP)</option></select></div>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <div class="section-header" onclick="toggleSection(this)">
-                        <span class="hover-label">Combat Strategy <span class="tooltiptext">Settings for combat initiation.</span></span>
-                        <span>▼</span>
-                    </div>
-                    <div class="section-content collapsible">
-                        <div class="select-field"><label class="hover-label">Initiator <span class="tooltiptext">Who attacks first.</span></label><select id="initiator"><option value="attacker" selected>Attacker</option><option value="defender">Defender</option></select></div>
-                    </div>
-                </div>
-
-                <button type="submit" class="button">Calculate Combat</button>
-            </form>
-        </div>
-        <div class="result-panel">
-            <div id="result">Enter values and click "Calculate Combat" or adjust inputs for real-time results.</div>
-        </div>
-    </div>
-
-    <script>
-        const skillDatabase = {
-            "none": { specialDamage: 0, cd: 0, effect: null },
-            "aether": { specialDamage: 0, cd: 5, effect: "heal 50% damage dealt" },
-            "galeforce": { specialDamage: 0, cd: 5, effect: "extra action" },
-            "dragonFang": { specialDamage: 0, cd: 4, effect: "boost damage by 50% Atk" },
-            "luna": { specialDamage: 0, cd: 3, effect: "reduce foe Def/Res by 50%" },
-            "rupturedSky": { specialDamage: 20, cd: 2, effect: "boost damage by 20% foe Atk if beast/dragon" },
-            "deadeye": { specialDamage: 0, cd: 3, effect: "double damage and pierce reduction" },
-            "vitalAstra": { specialDamage: 0, cd: 2, effect: "boost damage by 30% Spd" },
-            "iceberg": { specialDamage: 0, cd: 3, effect: "boost damage by 50% Res" },
-            "bonfire": { specialDamage: 0, cd: 3, effect: "boost damage by 50% Def" },
-            "glimmer": { specialDamage: 0, cd: 2, effect: "boost damage by 50%" },
-            "moonbow": { specialDamage: 0, cd: 2, effect: "reduce foe Def/Res by 30%" }
-        };
-
-        function toggleSection(header) {
-            const content = header.nextElementSibling;
-            if (content.classList.contains('collapsible')) {
-                content.classList.toggle('collapsed');
-                header.querySelector('span:last-child').textContent = content.classList.contains('collapsed') ? '►' : '▼';
-            }
-        }
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('overlay');
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('active');
-            syncDarkModeToggles();
-        }
-
-        function toggleDarkMode() {
-            const body = document.body;
-            const header = document.querySelector('.header');
-            const sidebar = document.getElementById('sidebar');
-            const container = document.querySelector('.container');
-            const inputPanel = document.querySelector('.input-panel');
-            const sections = document.querySelectorAll('.section');
-            const sectionHeaders = document.querySelectorAll('.section-header');
-            const labels = document.querySelectorAll('.input-field label, .select-field label');
-            const inputs = document.querySelectorAll('.input-field input, .select-field select');
-            const buttons = document.querySelectorAll('.button');
-            const result = document.getElementById('result');
-
-            body.classList.toggle('dark-mode');
-            header.classList.toggle('dark-mode');
-            sidebar.classList.toggle('dark-mode');
-            container.classList.toggle('dark-mode');
-            inputPanel.classList.toggle('dark-mode');
-            sections.forEach(section => section.classList.toggle('dark-mode'));
-            sectionHeaders.forEach(header => header.classList.toggle('dark-mode'));
-            labels.forEach(label => label.classList.toggle('dark-mode'));
-            inputs.forEach(input => input.classList.toggle('dark-mode'));
-            buttons.forEach(button => button.classList.toggle('dark-mode'));
-            result.classList.toggle('dark-mode');
-
-            syncDarkModeToggles();
-        }
-
-        function syncDarkModeToggles() {
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            document.getElementById('darkModeToggle').checked = isDarkMode;
-            document.getElementById('mobileDarkModeToggle').checked = isDarkMode;
-        }
-
-        function savePreset() {
-            const presetName = document.getElementById('presetName').value.trim();
-            if (!presetName) {
-                alert('Please enter a preset name.');
-                return;
-            }
-            const formData = Object.fromEntries(new FormData(document.getElementById('damageForm')));
-            localStorage.setItem(`feh_preset_${presetName}`, JSON.stringify(formData));
-            alert(`Preset "${presetName}" saved!`);
-        }
-
-        function loadPreset() {
-            const presetName = document.getElementById('presetName').value.trim();
-            const preset = localStorage.getItem(`feh_preset_${presetName}`);
-            if (!preset) {
-                alert(`No preset found with name "${presetName}".`);
-                return;
-            }
-            const formData = JSON.parse(preset);
-            Object.entries(formData).forEach(([key, value]) => {
-                const element = document.getElementById(key);
-                if (element) element.value = value;
-            });
-            alert(`Preset "${presetName}" loaded!`);
-            calculateDamage();
-        }
-
-        function calculateDamage(event) {
-            if (event) event.preventDefault();
-
-            const hpAtk = parseInt(document.getElementById('hpAtk').value) || 1;
-            const atk = parseInt(document.getElementById('atk').value) || 0;
-            const spd = parseInt(document.getElementById('spd').value) || 0;
-            const defAtk = parseInt(document.getElementById('defAtk').value) || 0;
-            const resAtk = parseInt(document.getElementById('resAtk').value) || 0;
-            const tempHpAtk = parseInt(document.getElementById('tempHpAtk').value) || 0;
-            const tempAtk = parseInt(document.getElementById('tempAtk').value) || 0;
-            const tempSpd = parseInt(document.getElementById('tempSpd').value) || 0;
-            const tempDefAtk = parseInt(document.getElementById('tempDefAtk').value) || 0;
-            const tempResAtk = parseInt(document.getElementById('tempResAtk').value) || 0;
-            const damageType = document.getElementById('damageType').value || 'physical';
-            const hits = parseInt(document.getElementById('hits').value) || 1;
-            const hpDef = parseInt(document.getElementById('hpDef').value) || 1;
-            const atkDef = parseInt(document.getElementById('atkDef').value) || 0;
-            const spdDef = parseInt(document.getElementById('spdDef').value) || 0;
-            const def = parseInt(document.getElementById('def').value) || 0;
-            const res = parseInt(document.getElementById('res').value) || 0;
-            const tempHpDef = parseInt(document.getElementById('tempHpDef').value) || 0;
-            const tempAtkDef = parseInt(document.getElementById('tempAtkDef').value) || 0;
-            const tempSpdDef = parseInt(document.getElementById('tempSpdDef').value) || 0;
-            const tempDef = parseInt(document.getElementById('tempDef').value) || 0;
-            const tempResDef = parseInt(document.getElementById('tempResDef').value) || 0;
-            const terrain = document.getElementById('terrain').value || 'no';
-            const advantage = document.getElementById('advantage').value || 'neutral';
-            const effective = document.getElementById('effective').value || 'no';
-            const attackerSpecial = document.getElementById('attackerSpecial').value || 'none';
-            const specialDataAtk = skillDatabase[attackerSpecial];
-            const specialCdMax = specialDataAtk.cd;
-            let specialCdStart = Math.min(parseInt(document.getElementById('specialCdStart').value) || specialCdMax, specialCdMax) || 0;
-            const defenderSpecial = document.getElementById('defenderSpecial').value || 'none';
-            const specialDataDef = skillDatabase[defenderSpecial];
-            const specialCdMaxDef = specialDataDef.cd;
-            let specialCdStartDef = Math.min(parseInt(document.getElementById('specialCdStartDef').value) || specialCdMaxDef, specialCdMaxDef) || 0;
-            const trueDamage = parseInt(document.getElementById('trueDamage').value) || 0;
-            const fixed = parseInt(document.getElementById('fixed').value) || 0;
-            const staff = document.getElementById('staff').value || 'no';
-            const followUpAtk = document.getElementById('followUpAtk').value || 'normal';
-            const followUpDef = document.getElementById('followUpDef').value || 'normal';
-            const pierce = document.getElementById('pierce').value || 'no';
-            const heavyBlade = document.getElementById('heavyBlade').value || 'no';
-            const specialSpiral = document.getElementById('specialSpiral').value || 'no';
-            const guard = document.getElementById('guard').value || 'no';
-            const atkBoost = parseInt(document.getElementById('atkBoost').value) || 0;
-            const defReduction = parseInt(document.getElementById('defReduction').value) || 0;
-            const timesPulse = document.getElementById('timesPulse').value || 'no';
-            const infantryPulse = parseInt(document.getElementById('infantryPulse').value) || 0;
-            const wrath = document.getElementById('wrath').value || 'no';
-            const specialPercentBoost = parseInt(document.getElementById('specialPercentBoost').value) || 0;
-            const neutralizePenalties = document.getElementById('neutralizePenalties').value || 'no';
-            const nullCDisrupt = document.getElementById('nullCDisrupt').value || 'no';
-            const hardyBearing = document.getElementById('hardyBearing').value || 'no';
-            const reductions = [
-                parseInt(document.getElementById('reduction1').value) || 0,
-                parseInt(document.getElementById('reduction2').value) || 0,
-                parseInt(document.getElementById('reduction3').value) || 0
-            ].filter(r => r > 0 && r <= 100);
-            const miracle = document.getElementById('miracle').value || 'no';
-            const initiator = document.getElementById('initiator').value || 'attacker';
-
-            const effectiveHpAtk = Math.max(hpAtk + tempHpAtk, 1);
-            let effectiveAtk = Math.max(atk + tempAtk + atkBoost, 0);
-            const effectiveSpd = Math.max(spd + tempSpd, 0);
-            let effectiveDefAtk = Math.max(defAtk + tempDefAtk, 0);
-            let effectiveResAtk = Math.max(resAtk + tempResAtk, 0);
-            const effectiveHpDef = Math.max(hpDef + tempHpDef, 1);
-            let effectiveAtkDef = Math.max(atkDef + tempAtkDef, 0);
-            const effectiveSpdDef = Math.max(spdDef + tempSpdDef, 0);
-            let effectiveDef = Math.max(def + tempDef, 0);
-            let effectiveRes = Math.max(res + tempResDef, 0);
-            if (damageType === 'adaptive') effectiveDef = Math.min(effectiveDef, effectiveRes);
-            effectiveDef = neutralizePenalties === 'yes' ? effectiveDef : Math.max(effectiveDef - defReduction, 0);
-            effectiveRes = neutralizePenalties === 'yes' ? effectiveRes : Math.max(effectiveRes - defReduction, 0);
-            if (terrain === 'yes') {
-                effectiveDef = Math.floor(effectiveDef * 1.3);
-                effectiveRes = Math.floor(effectiveRes * 1.3);
-            }
-
-            const spdDiff = effectiveSpd - effectiveSpdDef;
-            let followUpCountAtk = 0;
-            let followUpCountDef = 0;
-            if (followUpAtk === 'guaranteed' || (followUpAtk === 'normal' && spdDiff >= 5)) followUpCountAtk = 1;
-            if (followUpAtk === 'denied' || (followUpDef === 'null' && spdDiff < -5)) followUpCountAtk = 0;
-            if (followUpDef === 'guaranteed' || (followUpDef === 'normal' && spdDiff <= -5)) followUpCountDef = 1;
-            if (followUpDef === 'denied' || (followUpAtk === 'null' && spdDiff > 5)) followUpCountDef = 0;
-            if (followUpAtk === 'null') followUpCountDef = 0;
-            if (followUpDef === 'null') followUpCountAtk = 0;
-
-            let atkHits = Math.min(hits, 5);
-            let defHits = nullCDisrupt === 'yes' ? 0 : (hardyBearing === 'yes' && initiator === 'defender' ? 0 : 1);
-            if (initiator === 'attacker' && followUpCountAtk > 0) atkHits = Math.min(hits + 1, 5);
-            if (initiator === 'defender' && followUpCountDef > 0) defHits = Math.min(1 + followUpCountDef, 5);
-            if (initiator === 'attacker' && followUpCountDef > 0 && nullCDisrupt !== 'yes') defHits = 1;
-
-            const heavyBladeActive = heavyBlade === 'yes' && effectiveAtk > (damageType === 'physical' ? effectiveDef : effectiveRes);
-            let cdCountAtk = specialCdStart;
-            let cdCountDef = specialCdStartDef;
-            if (timesPulse === 'yes' && cdCountAtk === specialCdMax) cdCountAtk = Math.max(cdCountAtk - 1, 0);
-            cdCountAtk = Math.max(cdCountAtk - infantryPulse, 0);
-            let specialTriggersAtk = 0;
-            let specialTriggersDef = 0;
-
-            const calculateHit = (atkValue, defStat, spdValue, resValue, defValue, isSpecial, isStaff, isPiercing, reductionList, isWrathActive, specialEffect, isAttacker) => {
-                let ans = atkValue;
-                if (advantage === 'advantage') ans = Math.floor(ans * 1.2);
-                else if (advantage === 'disadvantage') ans = Math.ceil(ans * 0.8);
-                if (effective === 'yes') ans = Math.floor(ans * 1.5);
-                let baseDamage = Math.max(ans - defStat, 0);
-                if (isSpecial) {
-                    let specialDamage = isAttacker ? specialDataAtk.specialDamage : specialDataDef.specialDamage;
-                    if (specialEffect === "boost damage by 50% Atk") specialDamage = Math.floor(atkValue * 0.5);
-                    if (specialEffect === "reduce foe Def/Res by 50%") baseDamage = Math.max(ans - Math.floor(defStat * 0.5), 0);
-                    if (specialEffect === "boost damage by 20% foe Atk if beast/dragon") specialDamage += Math.floor(atkValue * 0.2);
-                    if (specialEffect === "double damage and pierce reduction") baseDamage *= 2;
-                    if (specialEffect === "boost damage by 30% Spd") specialDamage = Math.floor(spdValue * 0.3);
-                    if (specialEffect === "boost damage by 50% Res") specialDamage = Math.floor(resValue * 0.5);
-                    if (specialEffect === "boost damage by 50% Def") specialDamage = Math.floor(defValue * 0.5);
-                    if (specialEffect === "boost damage by 50%") baseDamage = Math.floor(baseDamage * 1.5);
-                    if (specialEffect === "reduce foe Def/Res by 30%") baseDamage = Math.max(ans - Math.floor(defStat * 0.3), 0);
-                    if (specialPercentBoost > 0 && isAttacker) specialDamage = Math.floor(specialDamage * (1 + specialPercentBoost / 100));
-                    if (isWrathActive) specialDamage += 10;
-                    baseDamage += specialDamage;
-                }
-                ans = Math.max(baseDamage, 0) + Math.floor(fixed);
-                if (isStaff) ans = Math.floor(ans * 0.5);
-                if (reductionList.length > 0 && isPiercing !== 'yes' && specialEffect !== "double damage and pierce reduction") {
-                    let totalReductionFactor = 1;
-                    reductionList.forEach(r => {
-                        totalReductionFactor *= (100 - (isPiercing === 'half' ? r / 2 : r)) / 100;
-                    });
-                    ans = Math.ceil(ans * totalReductionFactor);
-                }
-                return Math.max(ans, 0);
-            };
-
-            let totalDamageAtk = 0;
-            let totalDamageDef = 0;
-            let remainingHpDef = effectiveHpDef;
-            let remainingHpAtk = effectiveHpAtk;
-            let hitBreakdown = [];
-            let combatLog = [];
-            let cdLogAtk = [`Attacker CD: ${cdCountAtk}`];
-            let cdLogDef = [`Defender CD: ${cdCountDef}`];
-            const wrathThresholdAtk = Math.floor(effectiveHpAtk * 0.75);
-            const wrathThresholdDef = Math.floor(effectiveHpDef * 0.75);
-            let totalHealing = 0;
-            let extraActions = 0;
-
-            const simulateCombat = (isAttackerFirst) => {
-                const hitSequence = [];
-                if (isAttackerFirst) {
-                    for (let i = 1; i <= atkHits; i++) hitSequence.push({ type: 'atk', num: i });
-                    for (let i = 1; i <= defHits && remainingHpDef > 0; i++) hitSequence.push({ type: 'def', num: i });
-                } else {
-                    for (let i = 1; i <= defHits; i++) hitSequence.push({ type: 'def', num: i });
-                    for (let i = 1; i <= atkHits && remainingHpDef > 0; i++) hitSequence.push({ type: 'atk', num: i });
-                }
-
-                for (const hit of hitSequence) {
-                    if (hit.type === 'atk') {
-                        const chargePerHit = heavyBladeActive && guard !== 'yes' ? 2 : 1;
-                        const isSpecial = cdCountAtk <= 0 && specialCdMax > 0;
-                        const isWrathActive = wrath === 'yes' && remainingHpAtk <= wrathThresholdAtk;
-                        if (isSpecial) {
-                            cdCountAtk = specialCdMax;
-                            specialTriggersAtk++;
-                            if (specialSpiral === 'yes') cdCountAtk = Math.max(cdCountAtk - 2, 0);
-                            if (specialDataAtk.effect === "extra action") extraActions++;
-                        }
-                        const hitDamage = calculateHit(effectiveAtk, damageType === 'magical' ? effectiveRes : effectiveDef, effectiveSpd, effectiveResAtk, effectiveDefAtk, isSpecial, staff === 'yes', pierce, reductions, isWrathActive, specialDataAtk.effect, true);
-                        totalDamageAtk += hitDamage;
-                        if (isSpecial && specialDataAtk.effect === "heal 50% damage dealt") {
-                            const healing = Math.floor(hitDamage * 0.5);
-                            totalHealing += healing;
-                            remainingHpAtk = Math.min(remainingHpAtk + healing, effectiveHpAtk);
-                            combatLog.push(`Aether healed attacker for ${healing}, HP: ${remainingHpAtk}`);
-                        }
-                        remainingHpDef = Math.max(remainingHpDef - hitDamage, miracle === 'yes' && remainingHpDef > 1 ? 1 : 0);
-                        hitBreakdown.push(`Attacker Hit ${hit.num}: ${hitDamage}${isSpecial ? ' (Special)' : ''}${isWrathActive ? ' (Wrath)' : ''}`);
-                        combatLog.push(`Attacker Hit ${hit.num}: Dealt ${hitDamage} to Defender, HP: ${remainingHpDef}`);
-                        cdLogAtk.push(`Hit ${hit.num}: CD ${cdCountAtk} -> ${Math.max(cdCountAtk - chargePerHit, 0)}${isSpecial ? ' (Special)' : ''}`);
-                        cdCountAtk = Math.max(cdCountAtk - chargePerHit, 0);
-                        cdCountDef = guard === 'yes' ? cdCountDef : Math.max(cdCountDef - 1, 0);
-                    } else {
-                        const chargePerHit = 1;
-                        const isSpecial = cdCountDef <= 0 && specialCdMaxDef > 0;
-                        const isWrathActive = wrath === 'yes' && remainingHpDef <= wrathThresholdDef;
-                        if (isSpecial) {
-                            cdCountDef = specialCdMaxDef;
-                            specialTriggersDef++;
-                        }
-                        const hitDamage = calculateHit(effectiveAtkDef, damageType === 'physical' ? effectiveDefAtk : effectiveResAtk, effectiveSpdDef, effectiveRes, effectiveDef, isSpecial, false, 'no', [], isWrathActive, specialDataDef.effect, false);
-                        totalDamageDef += hitDamage;
-                        remainingHpAtk = Math.max(remainingHpAtk - hitDamage, 0);
-                        hitBreakdown.push(`Defender Hit ${hit.num}: ${hitDamage}${isSpecial ? ' (Special)' : ''}${isWrathActive ? ' (Wrath)' : ''}`);
-                        combatLog.push(`Defender Hit ${hit.num}: Dealt ${hitDamage} to Attacker, HP: ${remainingHpAtk}`);
-                        cdLogDef.push(`Hit ${hit.num}: CD ${cdCountDef} -> ${Math.max(cdCountDef - chargePerHit, 0)}${isSpecial ? ' (Special)' : ''}`);
-                        cdCountDef = Math.max(cdCountDef - chargePerHit, 0);
-                        cdCountAtk = Math.max(cdCountAtk - 1, 0);
-                    }
-                    if (remainingHpDef <= 0 || remainingHpAtk <= 0) break;
-                }
-            };
-
-            simulateCombat(initiator === 'attacker');
-            if (remainingHpDef > 0 && trueDamage > 0) {
-                remainingHpDef = Math.max(remainingHpDef - trueDamage, 0);
-                combatLog.push(`True Damage: Dealt ${trueDamage}, Defender HP: ${remainingHpDef}`);
-            }
-
-            const strategy = [];
-            if (spdDiff >= 5) strategy.push("Attacker Speed advantage.");
-            if (followUpAtk === 'guaranteed') strategy.push("Attacker guaranteed follow-up.");
-            if (followUpDef === 'guaranteed') strategy.push("Defender guaranteed follow-up.");
-            if (reductions.length > 1) strategy.push("Multiple reductions stacked.");
-            if (pierce === 'yes') strategy.push("Full piercing bypassed reduction.");
-            if (pierce === 'half') strategy.push("Half piercing reduced effectiveness of reduction.");
-            if (miracle === 'yes' && remainingHpDef === 1) strategy.push("Miracle saved defender.");
-            if (heavyBladeActive) strategy.push("Heavy Blade accelerated attacker special.");
-            if (specialSpiral === 'yes' && specialTriggersAtk > 0) strategy.push(`Special Spiral enabled ${specialTriggersAtk} trigger(s).`);
-            if (timesPulse === 'yes') strategy.push("Time’s Pulse reduced starting CD.");
-            if (infantryPulse > 0) strategy.push(`Infantry Pulse reduced starting CD by ${infantryPulse}.`);
-            if (wrath === 'yes' && remainingHpAtk <= wrathThresholdAtk) strategy.push("Wrath boosted attacker special damage.");
-            if (specialPercentBoost > 0) strategy.push(`Special damage boosted by ${specialPercentBoost}%.`);
-            if (neutralizePenalties === 'yes') strategy.push("Neutralized defender penalties.");
-            if (nullCDisrupt === 'yes' && defHits === 0) strategy.push("Null C-Disrupt prevented counterattack.");
-            if (hardyBearing === 'yes' && initiator === 'defender') strategy.push("Hardy Bearing disabled attacker priority.");
-            if (specialDataAtk.effect === "extra action" && specialTriggersAtk > 0) strategy.push(`Galeforce granted ${extraActions} extra action(s).`);
-            if (specialDataAtk.effect === "heal 50% damage dealt") strategy.push(`Aether healed ${totalHealing} HP.`);
-
-            const statDiffs = [
-                `Attacker Stats: HP ${effectiveHpAtk}, Atk ${effectiveAtk}, Spd ${effectiveSpd}, Def ${effectiveDefAtk}, Res ${effectiveResAtk}`,
-                `Defender Stats: HP ${effectiveHpDef}, Atk ${effectiveAtkDef}, Spd ${effectiveSpdDef}, Def ${effectiveDef}, Res ${effectiveRes}`,
-                `Spd Diff: ${spdDiff}`
-            ];
-
-            const optimization = [];
-            if (remainingHpDef > 0) {
-                const neededAtk = Math.ceil((effectiveHpDef - totalDamageAtk) / atkHits);
-                if (spdDiff < 5 && followUpCountAtk === 0) optimization.push(`Boost Spd by ${5 - spdDiff} or use Quick Riposte for follow-up.`);
-                if (specialTriggersAtk === 0 && specialCdMax > 0) optimization.push("Add Time’s Pulse or Slaying for special trigger.");
-                if (reductions.length > 0 && pierce === 'no') optimization.push("Use Deadeye or full piercing skill to bypass reduction.");
-                optimization.push(`Increase Atk by ${neededAtk} per hit to KO defender (Total: ${neededAtk * atkHits}).`);
-            }
-            if (remainingHpAtk <= 0) {
-                const neededDef = Math.ceil((totalDamageDef - effectiveHpAtk) / defHits);
-                optimization.push(`Boost HP by ${totalDamageDef - effectiveHpAtk + 1} or Def/Res by ${neededDef} per hit to survive counter.`);
-            }
-            if (specialTriggersDef > 0) optimization.push("Consider Pulse Smoke to delay defender special.");
-
-            document.getElementById('result').innerHTML = `
-                <strong>Attacker Damage: ${totalDamageAtk}</strong><br>
-                <strong>Defender Damage: ${totalDamageDef}</strong><br>
-                <strong>Defender HP Remaining: ${remainingHpDef}/${effectiveHpDef}</strong><br>
-                <strong>Attacker HP Remaining: ${remainingHpAtk}/${effectiveHpAtk}</strong><br>
-                ${totalHealing > 0 ? `<strong>Total Healing: ${totalHealing}</strong><br>` : ''}
-                ${extraActions > 0 ? `<strong>Extra Actions: ${extraActions}</strong><br>` : ''}<br>
-                <u>Combat Breakdown:</u><br>
-                ${hitBreakdown.join('<br>')}<br><br>
-                <u>Attacker Cooldown Log:</u><br>
-                ${cdLogAtk.join('<br>')}<br><br>
-                <u>Defender Cooldown Log:</u><br>
-                ${cdLogDef.join('<br>')}<br><br>
-                <u>Combat Log:</u><br>
-                ${combatLog.join('<br>')}<br><br>
-                <u>Stat Comparisons:</u><br>
-                ${statDiffs.join('<br>')}<br><br>
-                <u>Strategy Notes:</u><br>
-                ${strategy.length > 0 ? strategy.join('<br>') : 'No notable strategies.'}<br><br>
-                <u>AI-Driven Optimization:</u><br>
-                ${optimization.length > 0 ? optimization.join('<br>') : 'Build seems optimal.'}
-            `;
-        }
-
-        let debounceTimeout;
-        function debounceCalculateDamage(event) {
-            clearTimeout(debounceTimeout);
-            debounceTimeout = setTimeout(() => calculateDamage(event), 300);
-        }
-        document.querySelectorAll('input, select').forEach(el => {
-            el.addEventListener('input', debounceCalculateDamage);
-        });
-
-        document.addEventListener('DOMContentLoaded', () => {
-            syncDarkModeToggles();
-        });
-    </script>
-</body>
-</html>
+                        <div class="input-field"><label class="hover-label">HP <span class="tooltiptext">The unit's starting health points.</span></label><input type="number" id="hpAtk" min="1"></div>
+                        <div class="input-field"><label class="hover-label">Visible Atk <span class="tooltiptext">The unit's base attack stat.</span></label><input type="number" id="atk" min="0"></div>
+                        <div class="input-field"><label class="hover-label">Visible Spd <span class="tooltiptext">The unit's base speed stat.</span></label><input type="number" id="spd" min="0"></div>
+                        <div class="input-field"><label class="hover-label">Visible Def <span class="tooltiptext">The unit's base defense stat.</span></label><input type="number" id="defAtk" min="0"></div>
+                        <div class="input-field"><label class="hover-label">Visible Res <span class="tooltiptext">The unit's base resistance stat.</span></label><input type="number" id="resAtk" min="0"></div>
+                        <div class="input-field"><label class="hover-label">Temp HP Bonus <span class="tooltiptext">Temporary HP bonus added before combat.</span></label><input type="number" id="tempHpAtk" min="0"></div>
+                        <div class="input-field"><label class="hover-label">Temp Atk Bonus <span class="tooltiptext">Temporary attack bonus.</span></label><input type="number" id="tempAtk" min="0"></div>
+                        <div class="input-field"><label class="hover-label">Temp Spd Bonus <span class="tooltiptext">Temporary speed bonus.</span></label><input type="number" id="tempSpd" min="0"></div>
+                        <div class="input-field"><label class="hover-label">Temp Def Bonus <span class="tooltiptext">Temporary defense bonus.</span></label><input type="number" id="tempDefAtk" min="0"></div>
+                        <div class="input-field"><label class="hover-label">Temp Res Bonus <span class="tooltiptext">Temporary resistance bonus.</span></label><input type="number" id="tempResAtk" min="0"></div>
+                        <div class="select-field"><label class="hover-label">Damage Type <span class="tooltiptext">Physical (Def), Magical (Res), or Adaptive (Lower).</span></label><select id="damageType"><option value="physical">Physical</option><option value="magical">Mag
