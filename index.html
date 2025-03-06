@@ -161,8 +161,18 @@
             overflow-y: auto;
         }
 
+        #log details {
+            margin: 0.5rem 0;
+        }
+
+        #log summary {
+            font-size: clamp(0.875rem, 2vw, 1rem);
+            padding: 0.25rem;
+        }
+
         #log p {
             margin-bottom: 0.5rem;
+            padding-left: 1rem;
         }
 
         @media (max-width: 768px) {
@@ -210,7 +220,7 @@
     </div>
     <div class="container">
         <div class="calculator">
-            <!-- Left Side: Inputs -->
+            <!-- Left Side: Inputs (Unchanged) -->
             <div class="input-section">
                 <details open>
                     <summary>Unit Stats</summary>
@@ -430,7 +440,7 @@
                     <button onclick="resetForm()">Reset</button>
                 </div>
             </div>
-            <!-- Right Side: Result + Log -->
+            <!-- Right Side: Result + Updated Log -->
             <div class="result-section">
                 <div id="result">Damage: -</div>
                 <div id="log">
@@ -449,34 +459,39 @@
 
         // Stat Modification Functions
         const modifyStats = {
-            triangle: (atk, type, log) => {
+            triangle: (atk, type, log, formula) => {
                 const modifiers = { advantage: 1.2, disadvantage: 0.8, neutral: 1 };
                 const result = Math.floor(atk * (modifiers[type] || 1));
                 if (type !== 'neutral') log.push(`Triangle ${type} (${modifiers[type] === 1.2 ? '+20%' : '-20%'}: ${result})`);
                 return result;
             },
-            effective: (atk, isEffective, log) => {
+            effective: (atk, isEffective, log, formula) => {
                 if (isEffective === 'yes') {
                     atk = Math.floor(atk * 1.5);
-                    log.push(`Effective Damage (x1.5): ${atk}`);
+                    log.push(`Effective Damage: Multiplied by 1.5 to ${atk}`);
+                    formula.push('Effective(x1.5)');
                 }
                 return atk;
             },
-            terrain: (def, type, log) => {
+            terrain: (def, type, log, formula) => {
                 if (type === 'defensive') {
                     def = Math.floor(def * 1.3);
-                    log.push(`Defensive Terrain (+30%): ${def}`);
+                    log.push(`Defensive Terrain: Def/Res increased by 30% to ${def}`);
+                    formula.push('Terrain(+30%)');
                 }
                 return def;
             },
-            special: (baseDamage, def, type, damageType, log) => {
+            special: (baseDamage, def, type, damageType, log, formula) => {
                 const specials = {
                     moonbow: () => Math.floor(def * 0.3),
                     glimmer: () => Math.floor(baseDamage * 0.5),
                     astra: () => Math.floor(baseDamage * 1.5)
                 };
                 const damage = specials[type]?.() || 0;
-                if (damage) log.push(`${type.charAt(0).toUpperCase() + type.slice(1)}: +${damage}`);
+                if (damage) {
+                    log.push(`${type.charAt(0).toUpperCase() + type.slice(1)}: Adds ${damage} (${type === 'moonbow' ? `30% ${damageType === 'physical' ? 'Def' : 'Res'}` : type === 'glimmer' ? '50% Damage' : 'x2.5 Damage'})`);
+                    formula.push(`Special(${damage})`);
+                }
                 return damage;
             }
         };
@@ -484,8 +499,9 @@
         // Main Calculation Logic
         function calculateDamage() {
             const log = [];
+            const formula = [];
 
-            // Fetch all inputs once
+            // Fetch inputs once
             const inputs = {
                 attacker: {
                     atk: getInput('atk', 0, 99) + getInput('atkBuff', -99, 99),
@@ -549,37 +565,40 @@
                 return;
             }
 
-            // Stat Logging
-            log.push(`Attacker: Atk ${inputs.attacker.atk}, Spd ${inputs.attacker.spd}, HP ${inputs.attacker.hp}/${inputs.attacker.maxHP}`);
-            log.push(`Defender: Def ${inputs.defender.def}, Res ${inputs.defender.res}, Spd ${inputs.defender.spd}, HP ${inputs.defender.hp}/${inputs.defender.maxHP}`);
+            // Detailed Stat Logging
+            log.push(`Attacker Stats: Atk=${inputs.attacker.atk}, Spd=${inputs.attacker.spd}, HP=${inputs.attacker.hp}/${inputs.attacker.maxHP}`);
+            log.push(`Defender Stats: Def=${inputs.defender.def}, Res=${inputs.defender.res}, Spd=${inputs.defender.spd}, HP=${inputs.defender.hp}/${inputs.defender.maxHP}`);
 
             // Adaptive Damage
             const effectiveDef = inputs.combat.damageType === 'physical' ? inputs.defender.def :
                                  inputs.combat.damageType === 'magical' ? inputs.defender.res : Math.min(inputs.defender.def, inputs.defender.res);
-            log.push(`Effective ${inputs.combat.damageType === 'physical' ? 'Def' : 'Res'}: ${effectiveDef}`);
+            log.push(`Effective Defense: ${effectiveDef} (${inputs.combat.damageType})`);
 
             // Pre-Combat Damage
             let totalDamage = inputs.combat.unmitigated ? inputs.combat.preCombatDamage : Math.max(0, inputs.combat.preCombatDamage - effectiveDef);
-            if (inputs.combat.preCombatDamage) log.push(`Pre-Combat Damage: ${totalDamage}${inputs.combat.unmitigated ? ' (Unmitigated)' : ''}`);
+            if (inputs.combat.preCombatDamage) {
+                log.push(`Pre-Combat Damage: ${totalDamage}${inputs.combat.unmitigated ? ' (Unmitigated)' : ` (Reduced by ${effectiveDef})`}`);
+                formula.push(`PreCombat(${totalDamage})`);
+            }
 
             // Emblem Effects
             let drPierce = inputs.combat.pierceDR / 100;
             let counterAllowed = inputs.options.counter;
             if (inputs.combat.emblemEffect === 'ike') {
                 counterAllowed = true;
-                log.push("Emblem Ike: Nullifies counter disruption, 40% DR on first hit");
+                log.push("Emblem Ike: Nullifies counter disruption, applies 40% DR on first hit");
             } else if (inputs.combat.emblemEffect === 'lyn') {
                 totalDamage += 7;
-                log.push("Emblem Lyn: +7 True Damage");
+                log.push("Emblem Lyn: Adds 7 true damage");
+                formula.push("EmblemLyn(7)");
             }
 
-            // Canto
-            if (inputs.combat.cantoActive) log.push(`Canto (${inputs.combat.cantoDistance}): Unit can reposition`);
+            if (inputs.combat.cantoActive) log.push(`Canto: Allows ${inputs.combat.cantoDistance} spaces of movement post-combat`);
 
             // Core Modifiers
-            let atkModified = modifyStats.triangle(inputs.attacker.atk, inputs.combat.triangle, log);
-            atkModified = modifyStats.effective(atkModified, inputs.combat.effective, log);
-            let defModified = modifyStats.terrain(effectiveDef, inputs.combat.terrain, log);
+            let atkModified = modifyStats.triangle(inputs.attacker.atk, inputs.combat.triangle, log, formula);
+            atkModified = modifyStats.effective(atkModified, inputs.combat.effective, log, formula);
+            let defModified = modifyStats.terrain(effectiveDef, inputs.combat.terrain, log, formula);
 
             // Stat Interactions
             const statBoosts = {
@@ -589,85 +608,120 @@
             if (inputs.advanced.statCompare !== 'none') {
                 const boost = statBoosts[inputs.advanced.statCompare] || 0;
                 totalDamage += boost;
-                log.push(`Stat Comparison (${inputs.advanced.statCompare}): +${boost}`);
+                log.push(`Stat Comparison (${inputs.advanced.statCompare === 'atkVsDef' ? `Atk ${atkModified} vs Def/Res ${defModified}` : `Spd ${inputs.attacker.spd} vs Spd ${inputs.defender.spd}`}): Adds ${boost}`);
+                formula.push(`StatCompare(${boost})`);
             }
 
             let baseDamage = Math.max(0, atkModified - defModified);
             totalDamage += baseDamage;
-            log.push(`Base Damage: ${baseDamage}`);
+            log.push(`Base Damage: ${baseDamage} (Atk ${atkModified} - Def/Res ${defModified})`);
+            formula.push(`Base(${baseDamage})`);
 
-            const specialDamage = inputs.skills.heavyBlade ? modifyStats.special(baseDamage, defModified, inputs.combat.special, inputs.combat.damageType, log) : 0;
-            if (inputs.skills.heavyBlade && inputs.combat.special !== 'none') log.push("Heavy Blade: Special triggered");
+            const specialDamage = inputs.skills.heavyBlade ? modifyStats.special(baseDamage, defModified, inputs.combat.special, inputs.combat.damageType, log, formula) : 0;
+            if (inputs.skills.heavyBlade && inputs.combat.special !== 'none') log.push("Heavy Blade: Triggers special");
             totalDamage += specialDamage;
 
             if (inputs.combat.trueDamage) {
                 totalDamage += inputs.combat.trueDamage;
-                log.push(`True Damage: +${inputs.combat.trueDamage}`);
+                log.push(`True Damage: Adds ${inputs.combat.trueDamage}`);
+                formula.push(`True(${inputs.combat.trueDamage})`);
             }
 
             const hpPercent = inputs.attacker.hp / inputs.attacker.maxHP;
             if (inputs.advanced.hpThreshold === 'high' && hpPercent >= 0.8) {
                 totalDamage += 5;
-                log.push("High HP Threshold (≥80%): +5 Damage");
+                log.push(`HP Threshold: Adds 5 damage (HP ${inputs.attacker.hp}/${inputs.attacker.maxHP} ≥ 80%)`);
+                formula.push("HPThreshold(5)");
             }
 
             if (inputs.advanced.statConvertPercent && inputs.advanced.statConvert !== 'none') {
                 const convertValue = inputs.advanced.statConvert === 'spd' ? inputs.attacker.spd : defModified;
                 const convertDamage = Math.floor(convertValue * (inputs.advanced.statConvertPercent / 100));
                 totalDamage += convertDamage;
-                log.push(`Stat Conversion (${inputs.advanced.statConvertPercent}% of ${inputs.advanced.statConvert}): +${convertDamage}`);
+                log.push(`Stat Conversion: Adds ${convertDamage} (${inputs.advanced.statConvertPercent}% of ${inputs.advanced.statConvert === 'spd' ? 'Spd ' + inputs.attacker.spd : 'Def/Res ' + defModified})`);
+                formula.push(`StatConvert(${convertDamage})`);
             }
 
             if (inputs.advanced.statScale) {
                 const totalStats = Object.values(inputs.attacker).reduce((a, b) => a + b, 0) + Object.values(inputs.defender).reduce((a, b) => a + b, 0);
                 const scaleDamage = Math.floor(totalStats / 10) * inputs.advanced.statScale;
                 totalDamage += scaleDamage;
-                log.push(`Dynamic Stat Scaling (${totalStats} total stats, ${inputs.advanced.statScale}/10): +${scaleDamage}`);
+                log.push(`Dynamic Stat Scaling: Adds ${scaleDamage} (Total Stats ${totalStats}, ${inputs.advanced.statScale} per 10)`);
+                formula.push(`StatScale(${scaleDamage})`);
             }
 
+            let preCriticalDamage = totalDamage;
             if (inputs.combat.critical > 1) {
                 totalDamage = Math.floor(totalDamage * inputs.combat.critical);
-                log.push(`Critical (x${inputs.combat.critical}): ${totalDamage}`);
+                log.push(`Critical Hit: Multiplies damage by ${inputs.combat.critical} (${preCriticalDamage} → ${totalDamage})`);
+                formula.push(`Critical(x${inputs.combat.critical})`);
             }
 
+            let preStaffDamage = totalDamage;
             const staffMod = inputs.combat.weaponType === 'staff' ? 0.5 : 1;
             totalDamage = Math.floor(totalDamage * staffMod);
-            if (inputs.combat.weaponType === 'staff') log.push(`Staff Modifier (x0.5): ${totalDamage}`);
+            if (inputs.combat.weaponType === 'staff') {
+                log.push(`Staff Modifier: Reduces damage by 50% (${preStaffDamage} → ${totalDamage})`);
+                formula.push("Staff(x0.5)");
+            }
 
             // Damage Reduction
             let totalReduction = inputs.combat.percentReduction / 100;
-            if (inputs.skills.deflectMagic) totalReduction += 0.5;
-            if (inputs.combat.emblemEffect === 'ike') totalReduction += 0.4;
-            if (inputs.options.divineVein === 'stone') totalReduction += 0.2;
-            if (inputs.advanced.hpThreshold === 'low' && hpPercent < 0.5) totalReduction += 0.2;
-            if (inputs.skills.savior) totalDamage -= 10;
+            const reductions = [];
+            if (inputs.skills.deflectMagic) {
+                totalReduction += 0.5;
+                reductions.push("Deflect Magic (50%)");
+            }
+            if (inputs.combat.emblemEffect === 'ike') {
+                totalReduction += 0.4;
+                reductions.push("Emblem Ike (40%)");
+            }
+            if (inputs.options.divineVein === 'stone') {
+                totalReduction += 0.2;
+                reductions.push("Divine Vein Stone (20%)");
+            }
+            if (inputs.advanced.hpThreshold === 'low' && hpPercent < 0.5) {
+                totalReduction += 0.2;
+                reductions.push("Low HP Threshold (20%)");
+            }
+            let preReductionDamage = totalDamage;
             if (totalReduction > 0) {
                 const piercedReduction = totalReduction * (1 - drPierce);
                 totalDamage = Math.floor(totalDamage * (1 - piercedReduction));
-                log.push(`Total Reduction (${Math.round(totalReduction * 100)}% pierced to ${Math.round(piercedReduction * 100)}%): ${totalDamage}`);
-                if (inputs.skills.savior) log.push("Savior: Additional -10 damage");
+                log.push(`Damage Reduction: ${reductions.join(', ')} - Total ${Math.round(totalReduction * 100)}% reduced to ${Math.round(piercedReduction * 100)}% with ${inputs.combat.pierceDR}% pierce (${preReductionDamage} → ${totalDamage})`);
+                formula.push(`Reduction(-${Math.round(piercedReduction * 100)}%)`);
+            }
+            if (inputs.skills.savior) {
+                preReductionDamage = totalDamage;
+                totalDamage -= 10;
+                log.push(`Savior: Reduces damage by 10 (${preReductionDamage} → ${totalDamage})`);
+                formula.push("Savior(-10)");
             }
 
-            if (inputs.skills.warpBubble) log.push("Warp Bubble: Enemy movement restricted");
+            if (inputs.skills.warpBubble) log.push("Warp Bubble: Restricts enemy movement");
 
             // Follow-Up Logic
             let followUpDamage = 0;
             if (inputs.skills.guaranteeFollowUp || (!inputs.skills.nullFollowUp && inputs.attacker.spd >= inputs.defender.spd + 5)) {
                 followUpDamage = totalDamage;
                 totalDamage += followUpDamage;
-                log.push(inputs.skills.guaranteeFollowUp ? "Guaranteed Follow-Up" : `Follow-Up Attack (Spd ${inputs.attacker.spd} vs ${inputs.defender.spd})` + `: +${followUpDamage}`);
+                log.push(`${inputs.skills.guaranteeFollowUp ? 'Guaranteed Follow-Up' : `Follow-Up Attack (Spd ${inputs.attacker.spd} vs ${inputs.defender.spd})`}: Adds ${followUpDamage}`);
+                formula.push(`FollowUp(${followUpDamage})`);
             } else if (inputs.skills.nullFollowUp) {
                 log.push("Null Follow-Up: Prevents defender follow-up");
             }
 
+            let preGaleforceDamage = totalDamage;
             if (inputs.options.galeforce && inputs.options.extraActions > 0) {
                 totalDamage *= (1 + inputs.options.extraActions);
-                log.push(`Galeforce: ${inputs.options.extraActions} extra actions, total damage x${1 + inputs.options.extraActions}`);
+                log.push(`Galeforce: ${inputs.options.extraActions} extra actions, multiplies damage by ${1 + inputs.options.extraActions} (${preGaleforceDamage} → ${totalDamage})`);
+                formula.push(`Galeforce(x${1 + inputs.options.extraActions})`);
             }
 
             if (inputs.options.divineVein === 'flame') {
                 totalDamage += 10;
-                log.push("Divine Vein (Flame): +10 True Damage");
+                log.push("Divine Vein Flame: Adds 10 true damage");
+                formula.push("DivineVein(10)");
             }
 
             // Counterattack
@@ -678,21 +732,25 @@
                 let counterDamage = Math.max(0, counterDef - inputs.attacker.atk);
                 if (inputs.combat.emblemEffect === 'ike') counterDamage = Math.floor(counterDamage * 0.6);
                 atkRemainingHP = Math.max(0, inputs.attacker.hp - counterDamage);
-                log.push(`Counterattack: ${counterDamage} to Attacker`);
+                log.push(`Counterattack: Deals ${counterDamage} to attacker (Def/Res ${counterDef} - Atk ${inputs.attacker.atk})`);
             }
-            log.push(`HP Remaining - Attacker: ${atkRemainingHP}, Defender: ${defRemainingHP}`);
+            log.push(`HP Remaining: Attacker=${atkRemainingHP}/${inputs.attacker.maxHP}, Defender=${defRemainingHP}/${inputs.defender.maxHP}`);
 
             if (inputs.options.forecast) {
                 const forecastDamage = Math.floor((baseDamage + specialDamage + inputs.combat.trueDamage) * staffMod);
-                log.push(`Combat Forecast: ${forecastDamage}`);
+                log.push(`Combat Forecast: ${forecastDamage} (Base + Special + True before modifiers)`);
             }
+
+            // Formula View
+            const formulaString = formula.length ? `${formula.join(' + ')} = ${totalDamage}` : "No damage calculated";
+            log.push(`<details><summary>Formula View</summary><p>${formulaString}</p></details>`);
 
             updateUI(log, totalDamage);
         }
 
         function updateUI(log, damage = '-') {
             document.getElementById('result').innerText = `Damage: ${damage}`;
-            document.getElementById('log').innerHTML = log.map(step => `<p>${step}</p>`).join('');
+            document.getElementById('log').innerHTML = log.map(step => step.startsWith('<details') ? step : `<p>${step}</p>`).join('');
         }
 
         function resetForm() {
