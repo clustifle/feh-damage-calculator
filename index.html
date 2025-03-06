@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FEH Damage Calculator </title>
+    <title>FEH Damage Calculator</title>
     <style>
         * {
             margin: 0;
@@ -13,26 +13,52 @@
         }
 
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
             background: #f0f2f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        .calculator {
-            width: 400px;
-            background: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        /* Navigation Bar */
+        .navbar {
+            background: #0078d4; /* Windows 10X blue */
+            color: #fff;
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar h1 {
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        /* Main container */
+        .container {
+            display: flex;
+            flex: 1;
+            justify-content: center;
+            align-items: center;
             padding: 20px;
         }
 
-        h1 {
-            font-size: 24px;
-            color: #1a1a1a;
-            text-align: center;
-            margin-bottom: 20px;
+        .calculator {
+            display: flex;
+            width: 800px;
+            height: 500px;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* Left side (Inputs) */
+        .input-section {
+            flex: 1;
+            padding: 20px;
+            border-right: 1px solid #d1d3d4;
+            overflow-y: auto;
         }
 
         .section {
@@ -77,52 +103,74 @@
             background: #005ea2;
         }
 
+        /* Right side (Result) */
+        .result-section {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #f8f9fa;
+        }
+
         #result {
-            margin-top: 20px;
-            font-size: 18px;
+            font-size: 24px;
             color: #1a1a1a;
             text-align: center;
-            padding: 10px;
-            background: #f8f9fa;
+            padding: 20px;
+            background: #ffffff;
             border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            width: 100%;
         }
     </style>
 </head>
 <body>
-    <div class="calculator">
+    <div class="navbar">
         <h1>FEH Damage Calculator</h1>
-        <div class="section">
-            <label>Attacker's Atk</label>
-            <input type="number" id="atk" min="0" value="50">
+    </div>
+    <div class="container">
+        <div class="calculator">
+            <!-- Left Side: Inputs -->
+            <div class="input-section">
+                <div class="section">
+                    <label>Attacker's Atk</label>
+                    <input type="number" id="atk" min="0" value="50">
+                </div>
+                <div class="section">
+                    <label>Defender's Def/Res</label>
+                    <input type="number" id="def" min="0" value="30">
+                </div>
+                <div class="section">
+                    <label>Damage Type</label>
+                    <select id="damageType">
+                        <option value="physical">Physical (Def)</option>
+                        <option value="magical">Magical (Res)</option>
+                    </select>
+                </div>
+                <div class="section">
+                    <label>Weapon Triangle</label>
+                    <select id="triangle">
+                        <option value="neutral">Neutral (0%)</option>
+                        <option value="advantage">Advantage (+20%)</option>
+                        <option value="disadvantage">Disadvantage (-20%)</option>
+                    </select>
+                </div>
+                <div class="section">
+                    <label>Effective Damage</label>
+                    <select id="effective">
+                        <option value="no">No (x1)</option>
+                        <option value="yes">Yes (x1.5)</option>
+                    </select>
+                </div>
+                <button onclick="calculateDamage()">Calculate Damage</button>
+            </div>
+            <!-- Right Side: Result -->
+            <div class="result-section">
+                <div id="result">Damage: -</div>
+            </div>
         </div>
-        <div class="section">
-            <label>Defender's Def/Res</label>
-            <input type="number" id="def" min="0" value="30">
-        </div>
-        <div class="section">
-            <label>Damage Type</label>
-            <select id="damageType">
-                <option value="physical">Physical (Def)</option>
-                <option value="magical">Magical (Res)</option>
-            </select>
-        </div>
-        <div class="section">
-            <label>Weapon Triangle</label>
-            <select id="triangle">
-                <option value="neutral">Neutral (0%)</option>
-                <option value="advantage">Advantage (+20%)</option>
-                <option value="disadvantage">Disadvantage (-20%)</option>
-            </select>
-        </div>
-        <div class="section">
-            <label>Effective Damage</label>
-            <select id="effective">
-                <option value="no">No (x1)</option>
-                <option value="yes">Yes (x1.5)</option>
-            </select>
-        </div>
-        <button onclick="calculateDamage()">Calculate Damage</button>
-        <div id="result">Damage: -</div>
     </div>
 
     <script>
