@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FEH Damage Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="script.js"></script>
+</head>
+<body>
+    <div class="window">
+        <div class="title-bar">
+            <span>FEH Damage Calculator</span>
+        </div>
+        <div class="content">
+            <h2>Calculate Damage</h2>
+            <label for="attacker">Attacker Stats:</label>
+            <input type="number" id="atk" placeholder="Attack">
+            <input type="number" id="spd" placeholder="Speed">
+            <input type="number" id="def" placeholder="Defense">
+            <input type="number" id="res" placeholder="Resistance">
+            
+            <label for="defender">Defender Stats:</label>
+            <input type="number" id="defender-def" placeholder="Defense">
+            <input type="number" id="defender-res" placeholder="Resistance">
+            
+            <button onclick="calculateDamage()">Calculate</button>
+            <p id="result"></p>
+        </div>
+    </div>
+</body>
+</html>
