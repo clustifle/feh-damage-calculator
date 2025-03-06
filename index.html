@@ -21,32 +21,36 @@
 
         /* Navigation Bar */
         .navbar {
-            background: #0078d4; /* Windows 10X blue */
+            background: #0078d4;
             color: #fff;
-            padding: 15px 20px;
+            padding: 1rem;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 10;
         }
 
         .navbar h1 {
-            font-size: 20px;
+            font-size: clamp(1.25rem, 2.5vw, 1.5rem); /* Responsive font size */
             font-weight: 500;
+            text-align: center;
         }
 
         /* Main container */
         .container {
-            display: flex;
             flex: 1;
+            display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 5rem 1rem 1rem; /* Extra top padding for fixed navbar */
+            width: 100%;
         }
 
         .calculator {
             display: flex;
-            width: 800px;
-            height: 500px;
+            width: clamp(300px, 90vw, 800px); /* Min 300px, max 800px */
+            height: clamp(400px, 80vh, 600px); /* Responsive height */
             background: #ffffff;
             border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -56,26 +60,26 @@
         /* Left side (Inputs) */
         .input-section {
             flex: 1;
-            padding: 20px;
+            padding: 1.5rem;
             border-right: 1px solid #d1d3d4;
             overflow-y: auto;
         }
 
         .section {
-            margin-bottom: 20px;
+            margin-bottom: 1.25rem;
         }
 
         label {
             display: block;
-            font-size: 14px;
+            font-size: clamp(0.875rem, 2vw, 1rem);
             color: #333;
-            margin-bottom: 5px;
+            margin-bottom: 0.3125rem;
         }
 
         input[type="number"], select {
             width: 100%;
-            padding: 10px;
-            font-size: 16px;
+            padding: 0.625rem;
+            font-size: clamp(0.875rem, 2.5vw, 1rem);
             border: 1px solid #d1d3d4;
             border-radius: 8px;
             background: #f8f9fa;
@@ -89,8 +93,8 @@
 
         button {
             width: 100%;
-            padding: 12px;
-            font-size: 16px;
+            padding: 0.75rem;
+            font-size: clamp(0.875rem, 2.5vw, 1rem);
             border: none;
             border-radius: 8px;
             background: #0078d4;
@@ -106,7 +110,7 @@
         /* Right side (Result) */
         .result-section {
             flex: 1;
-            padding: 20px;
+            padding: 1.5rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -115,14 +119,52 @@
         }
 
         #result {
-            font-size: 24px;
+            font-size: clamp(1.25rem, 3vw, 1.5rem);
             color: #1a1a1a;
             text-align: center;
-            padding: 20px;
+            padding: 1.25rem;
             background: #ffffff;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             width: 100%;
+        }
+
+        /* Responsive Design with Media Queries */
+        @media (max-width: 768px) {
+            .calculator {
+                flex-direction: column; /* Stack vertically on smaller screens */
+                height: auto;
+                min-height: 500px;
+            }
+
+            .input-section {
+                border-right: none;
+                border-bottom: 1px solid #d1d3d4;
+            }
+
+            .result-section {
+                flex: none;
+                height: 50%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 4rem 0.5rem 0.5rem;
+            }
+
+            .calculator {
+                width: 95vw;
+                border-radius: 12px;
+            }
+
+            .input-section, .result-section {
+                padding: 1rem;
+            }
+
+            .section {
+                margin-bottom: 1rem;
+            }
         }
     </style>
 </head>
@@ -175,14 +217,12 @@
 
     <script>
         function calculateDamage() {
-            // Get input values
             const atk = parseInt(document.getElementById('atk').value) || 0;
             const def = parseInt(document.getElementById('def').value) || 0;
             const damageType = document.getElementById('damageType').value;
             const triangle = document.getElementById('triangle').value;
             const effective = document.getElementById('effective').value;
 
-            // Step 1: Apply Weapon Triangle modifier
             let atkModified = atk;
             if (triangle === 'advantage') {
                 atkModified = Math.floor(atk * 1.2);
@@ -190,16 +230,13 @@
                 atkModified = Math.floor(atk * 0.8);
             }
 
-            // Step 2: Apply Effective Damage
             if (effective === 'yes') {
                 atkModified = Math.floor(atkModified * 1.5);
             }
 
-            // Step 3: Calculate base damage
             let damage = atkModified - def;
             if (damage < 0) damage = 0;
 
-            // Display result
             document.getElementById('result').innerText = `Damage: ${damage}`;
         }
     </script>
